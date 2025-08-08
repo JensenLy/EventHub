@@ -7,7 +7,7 @@
 
 ## Members
 * Yusuf Kaan Yigiter 1 (s4095141)
-* Student Name 2 (sXXXXX)
+* Christian Nabati (s4107070)
 * Student Name 3 (sXXXXX)
 * Student Name 4 (sXXXXX)
 
