@@ -10,6 +10,7 @@
 * Christian Nabati (s4107070)
 * Pee Jay Cabale (s3950166)
 * (thomas)phu thai ta (4101740)
+* Anthony Vo (s3951749)
 
 ## Records
 
