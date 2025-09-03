@@ -1,6 +1,6 @@
 DROP TABLE IF EXISTS events;
 
-CREATE TABLE events {
+CREATE TABLE events (
   event_id IDENTITY PRIMARY KEY,
   name VARCHAR(255) NOT NULL,
   description VARCHAR(2000),
@@ -11,7 +11,7 @@ CREATE TABLE events {
   capacity INT,
   category_fk_id BIGINT,        -- Foreign key to category (not enforced yet)
   price DECIMAL(10,2)
-};
+);
 
 -- Create index for efficient upcoming event queries
-CREATE INDEX idx_event_date_time ON event(date_time);
+CREATE INDEX idx_event_date_time ON events(date_time);
