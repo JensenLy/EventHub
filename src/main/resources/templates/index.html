@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html
+  xmlns:th="http://www.thymeleaf.org"
+  lang="en"
+  th:replace="~{components/layout :: layout(~{::title}, ~{::section})}"
+>
+  <head>
+    <title>Home</title>
+  </head>
+  <body>
+    <section class="page">
+      <!-- Hero -->
+      <div class="hero">
+        <div class="hero-text">
+          <h1>Lorem Ipsum</h1>
+          <p>
+            Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do
+            eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim
+            ad minim veniam, quis nostrud exercitation.
+          </p>
+          <div class="hero-cta">
+            <a href="#" class="btn btn-light">Sign in</a>
+            <a href="#" class="btn btn-dark">Register</a>
+          </div>
+        </div>
+        <div class="hero-media">
+          <div class="media-placeholder">
+            <div class="media-icon">🖼️</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section title -->
+      <h2 class="section-title">
+        Browsing events in <span class="muted">(location name)</span>
+      </h2>
+
+      <!-- Labels/filters (static placeholders for now) -->
+      <div class="chip-row">
+        <span class="chip">Label</span><span class="chip">Label</span
+        ><span class="chip">Label</span> <span class="chip">Label</span
+        ><span class="chip">Label</span><span class="chip">Label</span>
+        <span class="chip">Label</span><span class="chip">Label</span>
+      </div>
+
+      <!-- Showing event cards-->
+      <div class="cards">
+        <!--When there are no events -->
+        <div class="empty-events" th:if="${#lists.isEmpty(events)}">
+          No upcoming events
+        </div>
+
+        <article
+          th:each="event : ${events}"
+          class="card"
+          th:if="${!#lists.isEmpty(events)}"
+        >
+          <div class="card-body">
+            <h3 class="card-title" th:text="${event.name}" />
+            <div class="card-price">
+              <span
+                th:text="${event.price != null ? '$' + #numbers.formatDecimal(event.price, 1, 'COMMA', 2, 'POINT') : '$0'}"
+              />
+            </div>
+            <p
+              class="card-text"
+              th:text="${event.description != null ? event.description : 'Body text.'}"
+            />
+          </div>
+          <div class="card-media">
+            <div class="img-placeholder"></div>
+          </div>
+        </article>
+      </div>
+
+      <!-- Stats (placeholders) -->
+      <div class="stats">
+        <div class="stat">
+          <div class="stat-num">24+</div>
+          <div class="stat-sub">Organizers use our website</div>
+        </div>
+        <div class="stat">
+          <div class="stat-num">17M</div>
+          <div class="stat-sub">Number of current users</div>
+        </div>
+        <div class="stat">
+          <div class="stat-num">+95%</div>
+          <div class="stat-sub">Customer satisfaction</div>
+        </div>
+      </div>
+    </section>
+  </body>
+</html>

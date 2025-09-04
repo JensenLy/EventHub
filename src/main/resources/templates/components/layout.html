@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html
+  xmlns:th="http://www.thymeleaf.org"
+  lang="en"
+  th:fragment="layout(title, content)"
+>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title th:replace="${title}">EventHub</title>
+
+    <!-- Pull in <head> fragment (meta, css, etc.) -->
+    <th:block th:replace="~{components/header :: head}"></th:block>
+  </head>
+  <body>
+    <!-- Top navigation / page header -->
+    <header th:replace="~{components/header :: header}"></header>
+
+    <!-- Page content -->
+    <main class="container" th:replace="${content}"></main>
+
+    <!-- Footer -->
+    <footer th:replace="~{components/footer :: footer}"></footer>
+  </body>
+</html>
