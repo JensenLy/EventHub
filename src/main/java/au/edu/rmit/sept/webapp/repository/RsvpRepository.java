@@ -31,13 +31,13 @@ public class RsvpRepository {
         );
 
     public List<RSVP> findRsvpsByEvent(Long eventId) {
-        String sql = "SELECT rsvp_id, user_id, event_id, status, timestamps FROM rsvps WHERE event_id = ?";
+        String sql = "SELECT rsvp_id, user_id, event_id, status, timestamps FROM rsvp WHERE event_id = ?";
         return jdbcTemplate.query(sql, MAPPER, eventId);
     }
 
     public RSVP createRsvp(RSVP rsvp) {
         String sql = """
-            INSERT INTO rsvps (user_id, event_id, status, timestamps)
+            INSERT INTO rsvp (user_id, event_id, status, timestamps)
             VALUES (?, ?, ?, ?)
             """;
         KeyHolder keyHolder = new GeneratedKeyHolder();
@@ -59,7 +59,7 @@ public class RsvpRepository {
     }
 
     public boolean checkUserAlreadyRsvped(Long userId, Long eventId) {
-        String sql = "SELECT COUNT(*) FROM rsvps WHERE user_id = ? AND event_id = ?";
+        String sql = "SELECT COUNT(*) FROM rsvp WHERE user_id = ? AND event_id = ?";
         Integer count = jdbcTemplate.queryForObject(sql, Integer.class, userId, eventId);
         return count != null && count > 0;
     }
