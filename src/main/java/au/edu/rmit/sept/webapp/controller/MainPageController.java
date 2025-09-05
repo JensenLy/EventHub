@@ -1,11 +1,13 @@
 package au.edu.rmit.sept.webapp.controller;
 
-import au.edu.rmit.sept.webapp.service.EventService;
-import au.edu.rmit.sept.webapp.model.Event;
+import java.util.List;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import java.util.List;
+
+import au.edu.rmit.sept.webapp.model.Event;
+import au.edu.rmit.sept.webapp.service.EventService;
 
 @Controller
 public class MainPageController {

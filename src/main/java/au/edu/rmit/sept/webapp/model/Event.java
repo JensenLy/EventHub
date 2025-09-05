@@ -5,6 +5,8 @@ import java.time.LocalDateTime;
 
 public class Event {
   private Long eventId;
+
+  
   private String name;
   private String desc;
   private Long createdByUserId;
@@ -14,6 +16,21 @@ public class Event {
   private Integer capacity;
   private Long categoryFkId;
   private BigDecimal price;
+
+
+  public Event() {
+    this.eventId = 0L;
+    this.name = "";
+    this.desc = "";
+    this.createdByUserId = 0L;
+    this.dateTime = null;
+    this.location = "";
+    this.category = "";
+    this.capacity = 0;
+    this.categoryFkId = 0L;
+    this.price = BigDecimal.ZERO;
+  }
+
 
   public Event(Long eventId, String name, String desc, Long createdByUserId, LocalDateTime dateTime, 
                 String location, String category, Integer capacity, Long categoryFkId, BigDecimal price) {
@@ -29,6 +46,41 @@ public class Event {
                   this.price = price;
                 }
 
+
+  public void setEventId(Long eventId) {
+    this.eventId = eventId;
+  }
+  public void setName(String name) {
+    this.name = name;
+  }
+  public String getDesc() {
+    return this.desc;
+  }
+  public void setDesc(String desc) {
+    this.desc = desc;
+  }
+  public void setCreatedByUserId(Long createdByUserId) {
+    this.createdByUserId = createdByUserId;
+  }
+  public void setDateTime(LocalDateTime dateTime) {
+    this.dateTime = dateTime;
+  }
+  public void setLocation(String location) {
+    this.location = location;
+  }
+  public void setCategory(String category) {
+    this.category = category;
+  }
+  public void setCapacity(Integer capacity) {
+    this.capacity = capacity;
+  }
+  public void setCategoryFkId(Long categoryFkId) {
+    this.categoryFkId = categoryFkId;
+  }
+  public void setPrice(BigDecimal price) {
+    this.price = price;
+  }
+  
   public Long getEventId() { return eventId; }
   public String getName() { return name; }
   public String getDescription() { return desc; }

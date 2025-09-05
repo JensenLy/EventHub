@@ -1,10 +1,12 @@
 package au.edu.rmit.sept.webapp.service;
 
-import au.edu.rmit.sept.webapp.model.Event;
-import au.edu.rmit.sept.webapp.repository.EventRepository;
+import java.time.LocalDateTime;
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import au.edu.rmit.sept.webapp.model.Event;
+import au.edu.rmit.sept.webapp.repository.EventRepository;
 
 @Service
 public class EventService {
@@ -16,5 +18,22 @@ public class EventService {
 
   public List<Event> getUpcomingEvents() {
     return eventRepo.findUpcomingEventsSorted();
+  }
+
+  public Event saveEvent(Event event)
+  {
+    return eventRepo.createEvent(event);
+  }
+
+  public boolean eventExist(Long organiserId, String name, String category, String location)
+  {
+    return eventRepo.checkEventExists(organiserId, name, category, location);
+  }
+
+  public boolean isValidDateTime(Event event) {
+    if (event.getDateTime() == null) return false;
+    LocalDateTime now = LocalDateTime.now();
+    int hour = event.getDateTime().getHour();
+    return event.getDateTime().isAfter(now) && hour >= 9 && hour <= 17;
   }
 }
