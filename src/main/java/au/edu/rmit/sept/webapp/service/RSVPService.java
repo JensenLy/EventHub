@@ -1,6 +1,6 @@
 package au.edu.rmit.sept.webapp.service;
 
-import java.util.List;
+import java.time.LocalDateTime;
 
 import org.springframework.stereotype.Service;
 
@@ -16,18 +16,19 @@ public class RSVPService {
         this.rsvpRepository = rsvpRepository;
     }
 
-    public List<RSVP> getRsvpsByEvent(Long eventId) {
-        return rsvpRepository.findRsvpsByEvent(eventId);
-    }
-
-    public RSVP createRsvp(RSVP rsvp) throws IllegalArgumentException {
-        if (rsvpRepository.checkUserAlreadyRsvped(rsvp.getUserId(), rsvp.getEventId())) {
-            throw new IllegalArgumentException("User has already RSVPed for this event");
+    public boolean toggleRSVP(Long userId, Long eventId) {
+        if (rsvpRepository.checkUserAlreadyRsvped(userId, eventId)) {
+            return rsvpRepository.removeRSVPbyID(userId, eventId); //not used
         }
-        return rsvpRepository.createRsvp(rsvp);
+        RSVP rsvp = new RSVP();
+        rsvp.setUserId(userId);
+        rsvp.setEventId(eventId);
+        rsvp.setStatus("going");
+        rsvp.setCreatedAt(LocalDateTime.now());
+        return rsvpRepository.save(rsvp);
     }
 
-    public boolean hasUserRsvped(Long userId, Long eventId) {
-        return rsvpRepository.checkUserAlreadyRsvped(userId, eventId);
+    public boolean deleteRsvp(Long userId, Long eventId) {
+        return rsvpRepository.removeRSVPbyID(userId, eventId);
     }
 }
