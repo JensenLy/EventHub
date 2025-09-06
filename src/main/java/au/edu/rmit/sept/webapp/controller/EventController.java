@@ -3,7 +3,9 @@ package au.edu.rmit.sept.webapp.controller;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import au.edu.rmit.sept.webapp.model.Event;
 import au.edu.rmit.sept.webapp.service.EventService;
@@ -31,27 +33,37 @@ public class EventController {
     }
 
   @PostMapping("/eventForm")
-    public String submitEvent(Event event, Model model) {
+    public String submitEvent(@ModelAttribute("event") Event event, @RequestParam(name = "categoryIds", required = false) List<Long> categoryIds, Model model) {
+    if (categoryIds == null) categoryIds = java.util.List.of();
+      // server-side cap (mirrors the JS)
+    if (categoryIds.size() > 3) {
+      model.addAttribute("confirmation", "You can select up to 3 categories only.");
+  } else if (!eventService.isValidDateTime(event)) {
+      model.addAttribute("confirmation", "Enter a valid date!");
+  } else {
+      // fetch names for duplicate check
+      List<String> categoryNames = categoryRepository.findNamesByIds(categoryIds);
 
-      if(eventService.isValidDateTime(event))
-      {
-        if(!eventService.eventExist(event.getCreatedByUserId(),event.getName(),event.getCategory(),event.getLocation()))
-        {
-          eventService.saveEvent(event);
+      boolean exists = eventService.eventExist(
+          event.getCreatedByUserId(),
+          event.getName(),
+          categoryNames,             
+          event.getLocation()
+      );
+
+      if (!exists) {
+          eventService.saveEventWithCategories(event, categoryIds); 
           model.addAttribute("confirmation", "Event created successfully!");
-        }
-        else {
+      } else {
           model.addAttribute("confirmation", "Event already exists!");
-        }
-      } else{
-        model.addAttribute("confirmation", "Enter a valid date!");
       }
-        List<EventCategory> categories = categoryRepository.findAll();
-        model.addAttribute("event", new Event()); 
-        model.addAttribute("categories", categories);
+  }
 
-        return "eventPage";
-    }
+  // re-populate form
+  model.addAttribute("event", new Event());
+  model.addAttribute("categories", categoryRepository.findAll());
+  return "eventPage";
+}
 
 
 

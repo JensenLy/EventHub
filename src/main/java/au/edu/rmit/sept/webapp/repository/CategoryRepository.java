@@ -19,4 +19,11 @@ public class CategoryRepository  {
         return jdbcTemplate.query(sql, (rs, rowNum) -> 
                  new EventCategory(rs.getLong("category_id"), rs.getString("name")));
     }
+
+    public List<String> findNamesByIds(List<Long> ids) {
+      if (ids == null || ids.isEmpty()) return List.of();
+      String placeholders = ids.stream().map(i -> "?").collect(java.util.stream.Collectors.joining(", "));
+      String sql = "SELECT name FROM categories WHERE category_id IN (" + placeholders + ")";
+      return jdbcTemplate.query(sql, ids.toArray(), (rs, rowNum) -> rs.getString("name"));
+    }
 }

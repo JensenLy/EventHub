@@ -1,67 +1,100 @@
 <div th:fragment="eventForm">
-    <form th:action="@{/eventForm}" th:object="${event}" method="post">
-      <div class="formFields">
-        <div class="formTitle formTitle-center">
-          <h1>Create a new event</h1>
-        </div>
-        <!-- Left column -->
-        <div>
-          <label for="name">Event Name</label>
-          <input type="text" id="name" th:field="*{name}" required minlength="2" maxlength="30">
-        </div>
-        <div>
-          <label for="desc">Description</label>
-          <input type="text" id="desc" th:field="*{desc}" required minlength="2" maxlength="75">
-        </div>
-        <div>
-          <label for="dateTime">Date and Time</label>
-          <input type="datetime-local" id="dateTime" th:field="*{dateTime}" required>
-        </div>
-        <div>
-          <label for="location">Location</label>
-          <input type="text" id="location" th:field="*{location}" required minlength="2" maxlength="40">
-        </div>
-        <!-- Right column -->
-        <div>
-          <label for="category">Select Category (up to 3):</label>
-          <p style="font-size: 0.8em; color: gray;">
-              Hold CTRL (Windows/Linux) or ⌘ (Mac) to select multiple categories.
-          </p>
-          <select style="width: 350px;" name="categoryFkIds[]" id="categories" multiple>
-            <th:block th:each="category : ${categories}">
-            <option th:text="${category.name}" th:value="${category.categoryId}"></option>
-            </th:block>
-          </select>
-        </div>
-        
-    <script>
-      // allows only 3 option selections and de-selects anymore
-      document.addEventListener("DOMContentLoaded", () => {
-      const select = document.getElementById("categories");
-      select.addEventListener("change", () => {
+  <form th:action="@{/eventForm}" th:object="${event}" method="post">
+    <div class="formFields">
+      <div class="formTitle formTitle-center">
+        <h1>Create a new event</h1>
+      </div>
+      <!-- Left column -->
+      <div>
+        <label for="name">Event Name</label>
+        <input
+          type="text"
+          id="name"
+          th:field="*{name}"
+          required
+          minlength="2"
+          maxlength="30"
+        />
+      </div>
+      <div>
+        <label for="desc">Description</label>
+        <input
+          type="text"
+          id="desc"
+          th:field="*{desc}"
+          required
+          minlength="2"
+          maxlength="75"
+        />
+      </div>
+      <div>
+        <label for="dateTime">Date and Time</label>
+        <input
+          type="datetime-local"
+          id="dateTime"
+          th:field="*{dateTime}"
+          required
+        />
+      </div>
+      <div>
+        <label for="location">Location</label>
+        <input
+          type="text"
+          id="location"
+          th:field="*{location}"
+          required
+          minlength="2"
+          maxlength="40"
+        />
+      </div>
+      <!-- Right column -->
+      <div>
+        <label for="category">Select Category (up to 3):</label>
+        <p style="font-size: 0.8em; color: gray">
+          Hold CTRL (Windows/Linux) or ⌘ (Mac) to select multiple categories.
+        </p>
+        <select
+          style="width: 350px"
+          name="categoryIds"
+          id="categories"
+          multiple
+        >
+          <option
+            th:each="category : ${categories}"
+            th:text="${category.name}"
+            th:value="${category.categoryId}"
+          ></option>
+        </select>
+      </div>
+
+      <script>
+        // allows only 3 option selections and de-selects anymore
+        document.addEventListener("DOMContentLoaded", () => {
+          const select = document.getElementById("categories");
+          select.addEventListener("change", () => {
             console.log("Select changed!");
-        const selected = Array.from(select.selectedOptions);
-        if(selected.length > 3){
-          alert("You can select up to 3 categories only.");
-          selected[selected.length - 1].selected = false;
-        }
-      });
-    });
-    </script>
-        <div>
-          <label for="capacity">Capacity</label>
-          <input type="text" id="capacity" th:field="*{capacity}" required>
-        </div>
-        <div>
-          <label for="price">Price</label>
-          <input type="text" id="price" th:field="*{price}" required>
-        </div>
+            const selected = Array.from(select.selectedOptions);
+            if (selected.length > 3) {
+              alert("You can select up to 3 categories only.");
+              selected[selected.length - 1].selected = false;
+            }
+          });
+        });
+      </script>
+      <div>
+        <label for="capacity">Capacity</label>
+        <input type="text" id="capacity" th:field="*{capacity}" required />
       </div>
-      <div class="saveEvent">
-        <button type="submit">Save</button>
+      <div>
+        <label for="price">Price</label>
+        <input type="text" id="price" th:field="*{price}" required />
       </div>
-      <div class="confirmationMsg">
-        <p th:if="${confirmation}" th:text="${confirmation}"></p>
-      </div>
-    </form>
+    </div>
+    <div class="saveEvent">
+      <button type="submit">Save</button>
+    </div>
+    <div class="confirmationMsg">
+      <p th:if="${confirmation}" th:text="${confirmation}"></p>
+    </div>
+  </form>
 </div>

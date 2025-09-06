@@ -113,6 +113,9 @@ public class EventRepository {
         jdbcTemplate.update(joinSql, event.getEventId(), catId);
     }   
   }
+  System.out.println("[DEBUG] Saved eventId=" + event.getEventId() 
+                   + " name=" + event.getName() 
+                   + " (no explicit categoryIds)");
 
     return event;
   }
@@ -149,4 +152,45 @@ public class EventRepository {
       return count != null && count > 0;
   }
 
+  public Event createEventWithCategories(Event event, List<Long> categoryIds) {
+    // Insert into events
+    String sql = """
+        INSERT INTO events (name, description, created_by_user_id, date_time, location, capacity, price)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+        """;
+
+    KeyHolder keyHolder = new GeneratedKeyHolder();
+
+    jdbcTemplate.update(connection -> {
+        PreparedStatement ps = connection.prepareStatement(sql, new String[]{"event_id"});
+        ps.setString(1, event.getName());
+        ps.setString(2, event.getDescription());
+        ps.setObject(3, event.getCreatedByUserId());
+        ps.setObject(4, event.getDateTime());
+        ps.setString(5, event.getLocation());
+        ps.setObject(6, event.getCapacity());
+        ps.setBigDecimal(7, event.getPrice());
+        return ps;
+    }, keyHolder);
+
+    Number key = keyHolder.getKey();
+    if (key != null) {
+        event.setEventId(key.longValue());
+    }
+
+    // Insert into event_categories
+    if (categoryIds != null && !categoryIds.isEmpty()) {
+        String joinSql = "INSERT INTO event_categories(event_id, category_id) VALUES (?, ?)";
+        for (Long catId : categoryIds) {
+            jdbcTemplate.update(joinSql, event.getEventId(), catId);
+        }
+    }
+    // ✅ Debug log
+    System.out.println("[DEBUG] Saved eventId=" + event.getEventId() 
+    + " name=" + event.getName() 
+    + " with categories=" + categoryIds);
+
+
+    return event;
+}
 }
