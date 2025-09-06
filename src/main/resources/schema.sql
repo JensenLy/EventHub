@@ -16,9 +16,7 @@ CREATE TABLE events (
   location VARCHAR(255) NOT NULL,
   category VARCHAR(100) NOT NULL,
   capacity INT,
-  category_fk_id BIGINT,        -- Foreign key to category (not enforced yet)
   price DECIMAL(10,2),
-  FOREIGN KEY (category_fk_id) REFERENCES categories(category_id)
 );
 
 CREATE TABLE event_categories (
