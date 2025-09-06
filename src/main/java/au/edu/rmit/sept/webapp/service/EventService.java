@@ -25,9 +25,9 @@ public class EventService {
     return eventRepo.createEvent(event);
   }
 
-  public boolean eventExist(Long organiserId, String name, String category, String location)
+  public boolean eventExist(Long organiserId, String name, List<Long> categoryFkIds, String location)
   {
-    return eventRepo.checkEventExists(organiserId, name, category, location);
+    return eventRepo.checkEventExists(organiserId, name, categoryFkIds, location);
   }
 
   public boolean isValidDateTime(Event event) {

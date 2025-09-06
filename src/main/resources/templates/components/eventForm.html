@@ -23,9 +23,31 @@
         </div>
         <!-- Right column -->
         <div>
-          <label for="category">Category</label>
-          <input type="text" id="category" th:field="*{category}" required>
+          <label for="category">Select Category (up to 3):</label>
+          <p style="font-size: 0.8em; color: gray;">
+              Hold CTRL (Windows/Linux) or ⌘ (Mac) to select multiple categories.
+          </p>
+          <select style="width: 350px;" name="categoryFkIds[]" id="categories" multiple>
+            <th:block th:each="category : ${categories}">
+            <option th:text="${category.name}" th:value="${category.categoryId}"></option>
+            </th:block>
+          </select>
         </div>
+        
+    <script>
+      // allows only 3 option selections and de-selects anymore
+      document.addEventListener("DOMContentLoaded", () => {
+      const select = document.getElementById("categories");
+      select.addEventListener("change", () => {
+            console.log("Select changed!");
+        const selected = Array.from(select.selectedOptions);
+        if(selected.length > 3){
+          alert("You can select up to 3 categories only.");
+          selected[selected.length - 1].selected = false;
+        }
+      });
+    });
+    </script>
         <div>
           <label for="capacity">Capacity</label>
           <input type="text" id="capacity" th:field="*{capacity}" required>

@@ -2,7 +2,9 @@ package au.edu.rmit.sept.webapp.repository;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -28,9 +30,9 @@ public class EventRepository {
                                               rs.getObject("created_by_user_id") != null ? rs.getLong("created_by_user_id") : null,
                                               rs.getTimestamp("date_time").toLocalDateTime(),
                                               rs.getString("location"),
-                                              rs.getString("category"),
+                                              List.of(rs.getString("category_name")),
                                               rs.getObject("capacity") != null ? rs.getInt("capacity") : null,
-                                              rs.getObject("category_fk_id") != null ? rs.getLong("category_fk_id") : null,
+                                              List.of(rs.getObject("category_fk_id") != null ? rs.getLong("category_fk_id") : null),
                                               rs.getBigDecimal("price")
   );
 
@@ -49,9 +51,10 @@ public class EventRepository {
 
   public Event createEvent(Event event) {
     String sql = """
-        INSERT INTO events (name, description, created_by_user_id, date_time, location, category, capacity, category_fk_id, price)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        INSERT INTO events (name, description, created_by_user_id, date_time, location, capacity, price)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
         """;
+
     KeyHolder keyHolder = new GeneratedKeyHolder();
     jdbcTemplate.update(connection -> {
         PreparedStatement ps = connection.prepareStatement(sql, new String[]{"event_id"});
@@ -60,24 +63,41 @@ public class EventRepository {
         ps.setLong(3, event.getCreatedByUserId());
         ps.setObject(4, event.getDateTime());
         ps.setString(5, event.getLocation());
-        ps.setString(6, event.getCategory());
-        ps.setInt(7, event.getCapacity());
-        ps.setLong(8, event.getCategoryFkId());
-        ps.setBigDecimal(9, event.getPrice());
+        ps.setInt(6, event.getCapacity());
+        ps.setBigDecimal(7, event.getPrice());
         return ps;
     }, keyHolder);
     Number key = keyHolder.getKey();
     if (key != null) {
         event.setEventId(key.longValue());
     }
+    if (event.getCategoryFkIds() != null && !event.getCategoryFkIds().isEmpty()) {
+    String joinSql = "INSERT INTO event_categories(event_id, category_id) VALUES (?, ?)"; 
+    for(Long catId : event.getCategoryFkIds()){
+      jdbcTemplate.update(joinSql, event.getEventId(), catId);
+    }   
+  }
+
     return event;
   }
 
 
-  public boolean checkEventExists(Long organiserId, String name, String category, String location)
+  public boolean checkEventExists(Long organiserId, String name, List<Long> categoryFkIds, String location)
   {
-    String sql = "SELECT COUNT(*) FROM events WHERE created_by_user_id = ? AND name = ? AND category = ? AND location = ?";
-    Integer count = jdbcTemplate.queryForObject(sql, Integer.class, organiserId, name, category, location);
+     if(categoryFkIds == null || categoryFkIds.isEmpty()) return false;
+
+    String placeholder = categoryFkIds.stream().map(id -> "?").collect(Collectors.joining(", "));
+
+    String sql = "SELECT COUNT(*) FROM events" + 
+    " WHERE created_by_user_id = ? AND name = ? AND location = ? AND category_fk_id IN (" + placeholder + ")";
+
+    List<Object> params = new ArrayList<>();
+    params.add(organiserId);
+    params.add(name);
+    params.add(location);
+    params.addAll(categoryFkIds);
+
+    Integer count = jdbcTemplate.queryForObject(sql, Integer.class, params.toArray());
 
       return count != null && count > 0;
   }

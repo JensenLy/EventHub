@@ -1,4 +1,11 @@
 DROP TABLE IF EXISTS events;
+DROP TABLE IF EXISTS event_categories;
+DROP TABLE IF EXISTS categories;
+
+CREATE TABLE categories (
+  category_id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  name VARCHAR(100) NOT NULL
+);
 
 CREATE TABLE events (
   event_id IDENTITY PRIMARY KEY,
@@ -10,8 +17,16 @@ CREATE TABLE events (
   category VARCHAR(100) NOT NULL,
   capacity INT,
   category_fk_id BIGINT,        -- Foreign key to category (not enforced yet)
-  price DECIMAL(10,2)
+  price DECIMAL(10,2),
+  FOREIGN KEY (category_fk_id) REFERENCES categories(category_id)
 );
 
+CREATE TABLE event_categories (
+    event_id BIGINT NOT NULL,
+    category_id BIGINT NOT NULL,
+    PRIMARY KEY(event_id, category_id),
+    FOREIGN KEY (event_id) REFERENCES events(event_id),
+    FOREIGN KEY (category_id) REFERENCES categories(category_id)
+);
 -- Create index for efficient upcoming event queries
 CREATE INDEX idx_event_date_time ON events(date_time);
