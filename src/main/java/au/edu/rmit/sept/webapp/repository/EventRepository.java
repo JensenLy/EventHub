@@ -82,10 +82,18 @@ public class EventRepository {
         PreparedStatement ps = connection.prepareStatement(sql, new String[]{"event_id"});
         ps.setString(1, event.getName());
         ps.setString(2, event.getDescription());
-        ps.setLong(3, event.getCreatedByUserId());
+        if (event.getCreatedByUserId() != null) {
+          ps.setLong(3, event.getCreatedByUserId());
+        } else {
+          ps.setObject(3, null);
+        }
         ps.setObject(4, event.getDateTime());
         ps.setString(5, event.getLocation());
-        ps.setInt(6, event.getCapacity());
+        if (event.getCapacity() != null) {
+          ps.setInt(6, event.getCapacity());
+        } else {
+          ps.setObject(6, null);
+        }
         ps.setBigDecimal(7, event.getPrice());
         return ps;
     }, keyHolder);
@@ -93,10 +101,10 @@ public class EventRepository {
     if (key != null) {
         event.setEventId(key.longValue());
     }
-    if (event.getCategoryFkIds() != null && !event.getCategoryFkIds().isEmpty()) {
+    if (event.getCategory() != null && !event.getCategory().isEmpty()) {
     String joinSql = "INSERT INTO event_categories(event_id, category_id) VALUES (?, ?)"; 
-    for(Long catId : event.getCategoryFkIds()){
-      jdbcTemplate.update(joinSql, event.getEventId(), catId);
+    for(String catName : event.getCategory()){
+      jdbcTemplate.update(joinSql, event.getEventId(), catName);
     }   
   }
 
