@@ -55,5 +55,11 @@ public class RsvpRepository {
         boolean status = jdbcTemplate.update(sql, userId, eventId) > 0;
         return status;
     }
+
+    public boolean removeRSVPbyEvent(Long eventId) {
+        String sql = "DELETE FROM rsvp WHERE event_id = ?";
+        boolean status = jdbcTemplate.update(sql, eventId) > 0;
+        return status;
+    }
 }
 

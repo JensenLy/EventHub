@@ -18,7 +18,7 @@ public class RSVPService {
 
     public boolean submitRSVP(Long userId, Long eventId, String status) {
         if (rsvpRepository.checkUserAlreadyRsvped(userId, eventId)) {
-            return rsvpRepository.removeRSVPbyID(userId, eventId); //not used
+            return false;
         }
         RSVP rsvp = new RSVP();
         rsvp.setUserId(userId);
@@ -30,5 +30,9 @@ public class RSVPService {
 
     public boolean deleteRsvp(Long userId, Long eventId) {
         return rsvpRepository.removeRSVPbyID(userId, eventId);
+    }
+
+    public boolean deleteRsvpByEvent(Long eventId) {
+        return rsvpRepository.removeRSVPbyEvent(eventId);
     }
 }

@@ -16,16 +16,19 @@ import au.edu.rmit.sept.webapp.model.Event;
 import au.edu.rmit.sept.webapp.model.EventCategory;
 import au.edu.rmit.sept.webapp.repository.CategoryRepository;
 import au.edu.rmit.sept.webapp.service.EventService;
+import au.edu.rmit.sept.webapp.service.RSVPService;
 
 @Controller
 public class EventController {
     private final EventService eventService;
     private final CategoryRepository categoryRepository;
+    private final RSVPService rsvpService;
 
-    public EventController(EventService Service, CategoryRepository categoryRepository)
+    public EventController(EventService Service, CategoryRepository categoryRepository, RSVPService rsvpService)
     {
       this.eventService = Service;
       this.categoryRepository = categoryRepository;
+      this.rsvpService = rsvpService;
     }
   
   //Create Event
@@ -122,6 +125,7 @@ public class EventController {
     @PostMapping("/event/delete/{id}")
     public String deleteEvent(@PathVariable("id") long eventId, RedirectAttributes redirectAttributes)
     {
+      rsvpService.deleteRsvpByEvent(eventId);
       eventService.deleteEventbyId(eventId);
       redirectAttributes.addFlashAttribute("successMessage", "Event deleted successfully!");
       return "redirect:/";
