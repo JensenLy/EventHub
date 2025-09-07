@@ -4,7 +4,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
-
+import org.springframework.transaction.annotation.Transactional;
 import au.edu.rmit.sept.webapp.model.Event;
 import au.edu.rmit.sept.webapp.repository.EventRepository;
 
@@ -19,15 +19,21 @@ public class EventService {
   public List<Event> getUpcomingEvents() {
     return eventRepo.findUpcomingEventsSorted();
   }
-
+  
+  @Transactional
   public Event saveEvent(Event event)
   {
     return eventRepo.createEvent(event);
   }
+  
+  @Transactional
+  public Event saveEventWithCategories(Event event, List<Long> categoryIds) {
+    return eventRepo.createEventWithCategories(event, categoryIds);
+  }
 
-  public boolean eventExist(Long organiserId, String name, String category, String location)
+  public boolean eventExist(Long organiserId, String name, List<String> categoryNames, String location)
   {
-    return eventRepo.checkEventExists(organiserId, name, category, location);
+    return eventRepo.checkEventExists(organiserId, name, categoryNames, location);
   }
 
   public boolean isValidDateTime(Event event) {
