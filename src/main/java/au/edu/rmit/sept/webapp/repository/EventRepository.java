@@ -26,6 +26,19 @@ public class EventRepository {
   }
 
 
+  private static final RowMapper<Event> MAPPER = (rs, rowNum) -> new Event(
+    rs.getLong("event_id"),
+    rs.getString("name"),
+    rs.getString("description"),
+    rs.getObject("created_by_user_id") != null ? rs.getLong("created_by_user_id") : null,
+    rs.getTimestamp("date_time").toLocalDateTime(),
+    rs.getString("location"),
+    new ArrayList<>(),
+    rs.getObject("capacity") != null ? rs.getInt("capacity") : null,
+    rs.getBigDecimal("price")
+);
+
+
   public List<Event> findUpcomingEventsSorted () {
     String sql = """
         SELECT  e.event_id, e.name, e.description, e.created_by_user_id,
@@ -212,9 +225,7 @@ public class EventRepository {
         event.getCreatedByUserId(),
         event.getDateTime(),
         event.getLocation(),
-        event.getCategory(),
         event.getCapacity(),
-        event.getCategoryFkId(),
         event.getPrice(),
         event.getEventId()
     );

@@ -22,12 +22,10 @@ CREATE TABLE events (
   event_id IDENTITY PRIMARY KEY,
   name VARCHAR(255) NOT NULL,
   description VARCHAR(2000),
-  created_by_user_id BIGINT,    -- Foreign key to user table (not enforced yet)
+  created_by_user_id BIGINT,
   date_time TIMESTAMP NOT NULL,
   location VARCHAR(255) NOT NULL,
   capacity INT,
-  price DECIMAL(10,2)
-  category_fk_id BIGINT,        -- Foreign key to category (not enforced yet)
   price DECIMAL(10,2),
   CONSTRAINT fk_event_user FOREIGN KEY (created_by_user_id) REFERENCES users(user_id)
 );
