@@ -260,4 +260,27 @@ public class EventRepository {
     jdbcTemplate.update(deleteEventSql, eventId);
   }
 
+  //Filter events by category
+  public List<Event> filterEventsByCategory(Long categoryId)
+  {
+    String sql = """
+        SELECT e.*
+        FROM events e
+        JOIN event_categories ec ON e.event_id = ec.event_id
+        WHERE ec.category_id = ?
+        """;
+    return jdbcTemplate.query(sql,
+        (rs, rowNum) -> {
+            Event event = new Event();
+            event.setEventId(rs.getLong("event_id"));
+            event.setName(rs.getString("name"));
+            event.setDesc(rs.getString("description")); 
+            event.setCreatedByUserId(rs.getLong("created_by_user_id"));
+            event.setDateTime(rs.getTimestamp("date_time").toLocalDateTime()); 
+            event.setLocation(rs.getString("location"));
+            event.setCapacity(rs.getInt("capacity"));
+            event.setPrice(rs.getBigDecimal("price"));
+            return event;
+        }, categoryId);
+  }
 }

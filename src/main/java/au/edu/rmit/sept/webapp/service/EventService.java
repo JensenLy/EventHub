@@ -56,4 +56,9 @@ public class EventService {
   public void deleteEventbyId(long eventId) {
      eventRepo.deleteEventbyId(eventId);
   }
+
+    public List<Event> filterEventsByCategory(Long categoryId)
+  {
+    return eventRepo.filterEventsByCategory(categoryId);
+  }
 }

@@ -138,4 +138,11 @@ public class EventController {
       return "redirect:/";
     }
 
+    @GetMapping("/FilterByCategory/{id}")
+    public String filterEventsByCategory(@PathVariable("id") Long categoryId, Model model)
+    {
+      eventService.filterEventsByCategory(categoryId);
+      return "index";
+    }
+
 }
