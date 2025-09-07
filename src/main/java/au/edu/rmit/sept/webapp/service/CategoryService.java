@@ -3,6 +3,7 @@ package au.edu.rmit.sept.webapp.service;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
+
 import au.edu.rmit.sept.webapp.model.EventCategory;
 import au.edu.rmit.sept.webapp.repository.CategoryRepository;
 
@@ -17,5 +18,10 @@ public class CategoryService {
 
     public List<EventCategory> getAllCategories() {
         return categoryRepository.findAll();
+    }
+
+    public void deleteCategories(Long categoryId)
+    {
+        categoryRepository.deleteCategoryById(categoryId);
     }
 }

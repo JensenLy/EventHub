@@ -26,4 +26,14 @@ public class CategoryRepository  {
       String sql = "SELECT name FROM categories WHERE category_id IN (" + placeholders + ")";
       return jdbcTemplate.query(sql, ids.toArray(), (rs, rowNum) -> rs.getString("name"));
     }
+
+    public void deleteCategoryById(Long categoryId)
+    {
+        //delete categories linked to events in event categories first
+        String deleteLinksSql = "DELETE FROM event_categories WHERE category_id = ?";
+        jdbcTemplate.update(deleteLinksSql, categoryId);
+
+        String sql = "DELETE FROM categories WHERE category_id = ?";
+        jdbcTemplate.update(sql, categoryId);
+    }
 }

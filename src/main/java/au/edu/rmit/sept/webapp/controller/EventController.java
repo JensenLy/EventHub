@@ -15,17 +15,20 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import au.edu.rmit.sept.webapp.model.Event;
 import au.edu.rmit.sept.webapp.model.EventCategory;
 import au.edu.rmit.sept.webapp.repository.CategoryRepository;
+import au.edu.rmit.sept.webapp.service.CategoryService;
 import au.edu.rmit.sept.webapp.service.EventService;
 
 @Controller
 public class EventController {
     private final EventService eventService;
+    private final CategoryService categoryService;
     private final CategoryRepository categoryRepository;
 
-    public EventController(EventService Service, CategoryRepository categoryRepository)
+    public EventController(EventService Service, CategoryRepository categoryRepository, CategoryService categoryService)
     {
       this.eventService = Service;
       this.categoryRepository = categoryRepository;
+      this.categoryService = categoryService;
     }
   
   //Create Event
@@ -127,5 +130,12 @@ public class EventController {
       return "redirect:/";
     }
 
+    @PostMapping("/category/delete/{id}")
+    public String deleteCategory(@PathVariable("id") long categoryId, RedirectAttributes redirectAttributes)
+    {
+      categoryService.deleteCategories(categoryId);
+      redirectAttributes.addFlashAttribute("successMessage", "Category deleted successfully!");
+      return "redirect:/";
+    }
 
 }
