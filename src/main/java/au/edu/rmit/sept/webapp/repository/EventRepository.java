@@ -1,7 +1,6 @@
 package au.edu.rmit.sept.webapp.repository;
 
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -212,14 +211,20 @@ public class EventRepository {
     return jdbcTemplate.queryForObject(sql, MAPPER, eventId);
   }
 
-  public int updateEvent(Event event)
+  public int updateEvent(Event event, List<Long> categoryIds)
   {
     String sql = """
         UPDATE events 
-        SET name = ?, description = ?, created_by_user_id = ?, date_time = ?, location = ?, category = ?, capacity = ?, category_fk_id = ?, price = ?
+        SET name = ?, 
+        description = ?, 
+        created_by_user_id = ?, 
+        date_time = ?, 
+        location = ?, 
+        capacity = ?, 
+        price = ?
         WHERE event_id = ?
         """;
-    return jdbcTemplate.update(sql,
+    int rows = jdbcTemplate.update(sql,
         event.getName(),
         event.getDescription(),
         event.getCreatedByUserId(),
@@ -229,6 +234,18 @@ public class EventRepository {
         event.getPrice(),
         event.getEventId()
     );
+
+    // update categories
+    jdbcTemplate.update("DELETE FROM event_categories WHERE event_id = ?", event.getEventId());
+    
+    if (categoryIds != null && !categoryIds.isEmpty()) {
+        String joinSql = "INSERT INTO event_categories(event_id, category_id) VALUES (?, ?)";
+        for (Long catId : categoryIds) {
+            jdbcTemplate.update(joinSql, event.getEventId(), catId);
+        }
+    }
+
+    return rows;
   }
 
   public void deleteEventbyId(Long eventId)

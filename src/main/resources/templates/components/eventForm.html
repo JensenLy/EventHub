@@ -33,7 +33,7 @@
         <input
           type="datetime-local"
           id="dateTime"
-          th:value="${formattedDateTime}"
+          th:field="*{dateTime}"
           required
         />
       </div>
@@ -84,18 +84,23 @@
       </script>
       <div>
         <label for="capacity">Capacity</label>
-        <input type="text" id="capacity" th:field="*{capacity}" required />
+        <input type="number" id="capacity" th:field="*{capacity}"required />
       </div>
       <div>
         <label for="price">Price</label>
-        <input type="text" id="price" th:field="*{price}" required />
+        <input type="number" id="price" th:field="*{price}" step="any" required/>
       </div>
     </div>
-    <div class="saveEvent">
-      <button type="submit">Save</button>
-    </div>
+      <div class="saveEvent">
+        <a th:href="@{/}"> Cancel </a>
+        <button type="submit" th:text="${isEdit} ? 'Update' : 'Save'">Save</button>
+      </div>
     <div class="confirmationMsg">
       <p th:if="${confirmation}" th:text="${confirmation}"></p>
     </div>
   </form>
 </div>
+
+
+
+

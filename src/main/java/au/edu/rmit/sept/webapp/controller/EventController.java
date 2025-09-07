@@ -41,13 +41,13 @@ public class EventController {
   @PostMapping("/eventForm")
     public String submitEvent(@ModelAttribute("event") Event event, @RequestParam(name = "categoryIds", required = false) List<Long> categoryIds, Model model, RedirectAttributes redirectAttributes) {
     event.setCreatedByUserId(5L);
-      if (categoryIds == null) categoryIds = java.util.List.of();
+    if (categoryIds == null) categoryIds = java.util.List.of();
       // server-side cap (mirrors the JS)
     if (categoryIds.size() > 3) {
-      model.addAttribute("confirmation", "You can select up to 3 categories only.");
-  } else if (!eventService.isValidDateTime(event)) {
-      model.addAttribute("confirmation", "Enter a valid date!");
-  } else {
+        model.addAttribute("confirmation", "You can select up to 3 categories only.");
+    } else if (!eventService.isValidDateTime(event)) {
+        model.addAttribute("confirmation", "Enter a valid date!");
+    } else {
       // fetch names for duplicate check
       List<String> categoryNames = categoryRepository.findNamesByIds(categoryIds);
 
@@ -60,18 +60,19 @@ public class EventController {
 
         if (!exists) {
             eventService.saveEventWithCategories(event, categoryIds); 
-            model.addAttribute("confirmation", "Event created successfully!");
-        } else {
-          model.addAttribute("confirmation", "Event already exists!");
-        }
-
+            redirectAttributes.addFlashAttribute("successMessage", "Event created successfully!");
+            return "redirect:/";
+        } 
+          
           // re-populate form
-          model.addAttribute("event", new Event());
+          model.addAttribute("event", event);
           model.addAttribute("categories", categoryRepository.findAll());
           model.addAttribute("isEdit", false);
+          model.addAttribute("confirmation", "Event already exists!");
           return "eventPage";
-        }
+      }
       model.addAttribute("event", event);
+      model.addAttribute("categories", categoryRepository.findAll());
       model.addAttribute("isEdit", false);
       return "eventPage";
     }
@@ -82,6 +83,7 @@ public class EventController {
     {
       Event event = eventService.findById(eventId);
       model.addAttribute("event", event);
+      model.addAttribute("categories", categoryRepository.findAll());
       model.addAttribute("isEdit", true);
 
       //Format date in order to render it to the event form
@@ -96,7 +98,7 @@ public class EventController {
     }
 
     @PostMapping("/event/edit/{id}")
-    public String updateEvent(@PathVariable("id") Long eventId, Event event, RedirectAttributes redirectAttributes, Model model)
+    public String updateEvent(@PathVariable("id") Long eventId, Event event, RedirectAttributes redirectAttributes, Model model, @RequestParam(value = "categoryIds", required = false) List<Long> categoryIds)
     {
 
       if(eventService.isValidDateTime(event))
@@ -104,7 +106,7 @@ public class EventController {
         event.setEventId(eventId);
         event.setCreatedByUserId(5L);
         event.setDateTime(event.getDateTime());
-        eventService.updateEvent(event);
+        eventService.updateEvent(event, categoryIds);
         model.addAttribute("isEdit", true);
         redirectAttributes.addFlashAttribute("successMessage", "Event updated successfully!");
         return "redirect:/";
