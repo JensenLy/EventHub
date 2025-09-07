@@ -32,7 +32,7 @@ public class EventController {
 
   @PostMapping("/eventForm")
     public String submitEvent(Event event, Model model, RedirectAttributes redirectAttributes) {
-
+      event.setCreatedByUserId(5L);
       if(eventService.isValidDateTime(event))
       {
         if(!eventService.eventExist(event.getCreatedByUserId(),event.getName(),event.getCategory(),event.getLocation()))
@@ -78,6 +78,7 @@ public class EventController {
       if(eventService.isValidDateTime(event))
       {
         event.setEventId(eventId);
+        event.setCreatedByUserId(5L);
         event.setDateTime(event.getDateTime());
         eventService.updateEvent(event);
         model.addAttribute("isEdit", true);

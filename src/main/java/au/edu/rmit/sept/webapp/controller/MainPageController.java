@@ -21,6 +21,7 @@ public class MainPageController {
   public String mainpage(Model model) {
     List<Event> events = eventService.getUpcomingEvents();
     model.addAttribute("events", events);
+    model.addAttribute("currentUserId", 5L);
     return "index";
   }
 }
