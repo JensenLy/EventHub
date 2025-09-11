@@ -323,4 +323,26 @@ public class EventRepository {
           return new ArrayList<>(map.values());
       });
   }
+
+  // Find a single event by id that belongs to a specific organiser (preventing pull rsvp data from other events created by other organisers)
+  public Event findEventsByIdAndOrganiser(Long eventId, Long organiserId) {
+    String sql = """
+        SELECT e.event_id, e.name, e.description, e.created_by_user_id,
+                e.date_time, e.location, e.capacity, e.price
+        FROM events e
+        WHERE e.event_id = ? AND e.created_by_user_id = ?
+        """;
+    List <Event> list = jdbcTemplate.query(sql, ps -> {ps.setLong(1, eventId); ps.setLong(2, organiserId);}, (rs, rowNum) -> new Event(
+      rs.getLong("event_id"),
+      rs.getString("name"),
+      rs.getString("description"),
+      rs.getObject("created_by_user_id") != null ? rs.getLong("created_by_user_id") : null,
+      rs.getTimestamp("date_time").toLocalDateTime(),
+      rs.getString("location"),
+      new ArrayList<>(),
+      rs.getObject("capacity") != null ? rs.getInt("capacity") : null,
+      rs.getBigDecimal("price")
+    ));
+    return list.isEmpty() ? null : list.get(0);
+  }
 }
