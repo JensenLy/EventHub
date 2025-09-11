@@ -1,6 +1,7 @@
 package au.edu.rmit.sept.webapp.service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import org.springframework.stereotype.Service;
 
@@ -34,5 +35,9 @@ public class RSVPService {
 
     public boolean deleteRsvpByEvent(Long eventId) {
         return rsvpRepository.removeRSVPbyEvent(eventId);
+    }
+
+    public List<RsvpRepository.AttendeeRow> getAllAttendeesForEvent(Long eventId) {
+      return rsvpRepository.findAttendeesByEvent(eventId);
     }
 }

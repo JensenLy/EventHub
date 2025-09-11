@@ -61,4 +61,12 @@ public class EventService {
   {
     return eventRepo.filterEventsByCategory(categoryId);
   }
+
+  public List<Event> getEventsByOrganiser(Long organiserId) {
+    return eventRepo.findEventsByOrganiser(organiserId);
+  }
+
+  public Event findEventsByIdAndOrganiser(Long eventId, Long organiserId) {
+    return eventRepo.findEventsByIdAndOrganiser(eventId, organiserId);
+  }
 }
