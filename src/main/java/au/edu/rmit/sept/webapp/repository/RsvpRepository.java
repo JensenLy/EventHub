@@ -79,7 +79,7 @@ public class RsvpRepository {
           SELECT u.name, u.email, r.status
           FROM rsvp r
           JOIN users u ON u.user_id = r.user_id
-          WHERE r.evemt_id = ?
+          WHERE r.event_id = ?
           ORDER BY u.name ASC
           """;
       return jdbcTemplate.query(sql, ps -> ps.setLong(1, eventId),

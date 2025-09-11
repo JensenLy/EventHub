@@ -30,7 +30,7 @@ public class OrganiserController {
     Long organiserId = currentOrganiserId();
     List<Event> events = eventService.getEventsByOrganiser(organiserId);
     model.addAttribute("events", events);
-    return "organiser_dashboard";
+    return "organiserDashboard";
   }
 
   @GetMapping("/events/{eventId}/rsvps")
@@ -42,12 +42,12 @@ public class OrganiserController {
       model.addAttribute("error", "Event not found or not hosted by you.");
       // Reload the dashboard list
       model.addAttribute("events", eventService.getEventsByOrganiser(organiserId));
-      return "organiser_dashboard";
+      return "organiserDashboard";
     }
 
     List<RsvpRepository.AttendeeRow> attendees = rsvpService.getAllAttendeesForEvent(eventId);
     model.addAttribute("event", event);
     model.addAttribute("attendees", attendees);
-    return "organiser_event_rsvps";
+    return "organiserRsvps";
   }
 }
