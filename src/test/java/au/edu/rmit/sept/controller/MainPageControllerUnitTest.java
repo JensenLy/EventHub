@@ -173,5 +173,4 @@ public class MainPageControllerUnitTest {
         verify(rsvpRepository, never()).checkUserAlreadyRsvped(anyLong(), anyLong());
         verifyNoMoreInteractions(eventService, categoryService, rsvpRepository);
     }
-
 }
