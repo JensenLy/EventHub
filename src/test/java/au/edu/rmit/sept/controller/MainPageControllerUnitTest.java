@@ -43,7 +43,7 @@ public class MainPageControllerUnitTest {
     }
 
     // --- helpers ---
-    private static Event ev(long id, String name) {
+    private static Event event(long id, String name) {
         Event e = new Event();
         e.setEventId(id);
         e.setName(name);
@@ -63,7 +63,7 @@ public class MainPageControllerUnitTest {
     void mainpage_withoutCategory_showsUpcomingEvents_andRsvpMap() {
         Model model = new ExtendedModelMap();
 
-        var upcoming = List.of(ev(1L, "Tech Talk"), ev(2L, "Career Fair"));
+        var upcoming = List.of(event(1L, "Tech Talk"), event(2L, "Career Fair"));
         when(eventService.getUpcomingEvents()).thenReturn(upcoming); // used twice by controller
         when(categoryService.getAllCategories()).thenReturn(List.of(cat(10L, "Tech"), cat(20L, "Networking")));
         when(rsvpRepository.checkUserAlreadyRsvped(5L, 1L)).thenReturn(true);
@@ -95,4 +95,43 @@ public class MainPageControllerUnitTest {
         verify(rsvpRepository).checkUserAlreadyRsvped(5L, 2L);
         verifyNoMoreInteractions(eventService, categoryService, rsvpRepository);
     }
+
+    /**
+     * Scenario: GET "/?categoryId=8".
+     * Expect:
+     *  - RSVP map is still built from the full upcoming list.
+     *  - Displayed events are from filterEventsByCategory(8).
+     *  - Model echoes selectedCategoryId=8.
+     */
+    @Test
+    void mainpage_withCategory_filtersDisplayedEvents_andKeepsRsvpMapFromUpcoming() {
+        Model model = new ExtendedModelMap();
+
+        var upcomingForRsvp = List.of(event(1L, "Tech Talk"), event(2L, "Career Fair"));
+        var filtered = List.of(event(2L, "Career Fair")); // only the matching category event
+        when(eventService.getUpcomingEvents()).thenReturn(upcomingForRsvp);
+        when(eventService.filterEventsByCategory(8L)).thenReturn(filtered);
+        when(categoryService.getAllCategories()).thenReturn(List.of(cat(8L, "Tech")));
+        when(rsvpRepository.checkUserAlreadyRsvped(5L, 1L)).thenReturn(true);
+        when(rsvpRepository.checkUserAlreadyRsvped(5L, 2L)).thenReturn(false);
+
+        String view = controller.mainpage(8L, model);
+
+        assertThat(view).isEqualTo("index");
+        assertThat(model.getAttribute("events")).isEqualTo(filtered);
+        assertThat(model.getAttribute("selectedCategoryId")).isEqualTo(8L);
+
+        // RSVP map still includes all upcoming events
+        @SuppressWarnings("unchecked")
+        Map<Long, Boolean> rsvpMap = (Map<Long, Boolean>) model.getAttribute("rsvpStatusMap");
+        assertThat(rsvpMap).containsEntry(1L, true).containsEntry(2L, false);
+
+        verify(eventService).getUpcomingEvents(); // for RSVP map
+        verify(eventService).filterEventsByCategory(8L); // for displayed list
+        verify(categoryService).getAllCategories();
+        verify(rsvpRepository).checkUserAlreadyRsvped(5L, 1L);
+        verify(rsvpRepository).checkUserAlreadyRsvped(5L, 2L);
+        verifyNoMoreInteractions(eventService, categoryService, rsvpRepository);
+    }
+
 }
