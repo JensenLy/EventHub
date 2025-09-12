@@ -14,7 +14,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import au.edu.rmit.sept.webapp.model.Event;
 import au.edu.rmit.sept.webapp.model.EventCategory;
-import au.edu.rmit.sept.webapp.repository.CategoryRepository;
 import au.edu.rmit.sept.webapp.service.CategoryService;
 import au.edu.rmit.sept.webapp.service.EventService;
 import au.edu.rmit.sept.webapp.service.RSVPService;
@@ -23,13 +22,11 @@ import au.edu.rmit.sept.webapp.service.RSVPService;
 public class EventController {
     private final EventService eventService;
     private final CategoryService categoryService;
-    private final CategoryRepository categoryRepository;
     private final RSVPService rsvpService;
 
-    public EventController(EventService Service, CategoryRepository categoryRepository, CategoryService categoryService, RSVPService rsvpService)
+    public EventController(EventService Service, CategoryService categoryService, RSVPService rsvpService)
     {
       this.eventService = Service;
-      this.categoryRepository = categoryRepository;
       this.categoryService = categoryService;
       this.rsvpService = rsvpService;
     }
@@ -37,7 +34,7 @@ public class EventController {
   //Create Event
   @GetMapping("/eventPage")
     public String eventPage(Model model) {
-      List<EventCategory> categories = categoryRepository.findAll();
+      List<EventCategory> categories = categoryService.getAllCategories();
       model.addAttribute("categories", categories);
       model.addAttribute("event", new Event());
       model.addAttribute("isEdit", false);
@@ -55,7 +52,7 @@ public class EventController {
         model.addAttribute("confirmation", "Enter a valid date!");
     } else {
       // fetch names for duplicate check
-      List<String> categoryNames = categoryRepository.findNamesByIds(categoryIds);
+      List<String> categoryNames = categoryService.findCategoryNamesByIds(categoryIds);
 
       boolean exists = eventService.eventExist(
           event.getCreatedByUserId(),
@@ -72,13 +69,13 @@ public class EventController {
           
           // re-populate form
           model.addAttribute("event", event);
-          model.addAttribute("categories", categoryRepository.findAll());
+          model.addAttribute("categories", categoryService.getAllCategories());
           model.addAttribute("isEdit", false);
           model.addAttribute("confirmation", "Event already exists!");
           return "eventPage";
       }
       model.addAttribute("event", event);
-      model.addAttribute("categories", categoryRepository.findAll());
+      model.addAttribute("categories", categoryService.getAllCategories());
       model.addAttribute("isEdit", false);
       return "eventPage";
     }
@@ -89,7 +86,7 @@ public class EventController {
     {
       Event event = eventService.findById(eventId);
       model.addAttribute("event", event);
-      model.addAttribute("categories", categoryRepository.findAll());
+      model.addAttribute("categories", categoryService.getAllCategories());
       model.addAttribute("isEdit", true);
 
       //Format date in order to render it to the event form
