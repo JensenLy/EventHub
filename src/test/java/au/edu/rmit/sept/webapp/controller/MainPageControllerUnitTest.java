@@ -1,4 +1,4 @@
-package au.edu.rmit.sept.controller;
+package au.edu.rmit.sept.webapp.controller;
 
 import au.edu.rmit.sept.webapp.controller.MainPageController;
 import au.edu.rmit.sept.webapp.model.Event;

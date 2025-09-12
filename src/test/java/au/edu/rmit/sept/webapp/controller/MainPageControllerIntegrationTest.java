@@ -1,4 +1,4 @@
-package au.edu.rmit.sept.controller;
+package au.edu.rmit.sept.webapp.controller;
 
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
