@@ -46,6 +46,25 @@
 		</dependency>
 
     <dependency>
+        <groupId>org.mockito</groupId>
+        <artifactId>mockito-core</artifactId>
+        <version>5.13.0</version> <!-- or newer -->
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>net.bytebuddy</groupId>
+        <artifactId>byte-buddy</artifactId>
+        <version>1.15.10</version> <!-- or newer -->
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>net.bytebuddy</groupId>
+        <artifactId>byte-buddy-agent</artifactId>
+        <version>1.15.10</version> <!-- or newer -->
+        <scope>test</scope>
+      </dependency>
+
+    <dependency>
       <groupId>com.h2database</groupId>
       <artifactId>h2</artifactId>
       <scope>runtime</scope>
