@@ -20,6 +20,7 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
+import static org.assertj.core.api.Assertions.tuple;
 
 
 /**
@@ -131,6 +132,45 @@ public class MainPageControllerUnitTest {
         verify(categoryService).getAllCategories();
         verify(rsvpRepository).checkUserAlreadyRsvped(5L, 1L);
         verify(rsvpRepository).checkUserAlreadyRsvped(5L, 2L);
+        verifyNoMoreInteractions(eventService, categoryService, rsvpRepository);
+    }
+
+    /**
+     * Scenario: GET "/" when there are no upcoming events.
+     * Expect:
+     *  - events is empty
+     *  - rsvpStatusMap is empty
+     *  - categories still present
+     */
+    @Test
+    void mainpage_emptyUpcoming() {
+        Model model = new ExtendedModelMap();
+
+        when(eventService.getUpcomingEvents()).thenReturn(List.of());
+        when(categoryService.getAllCategories()).thenReturn(List.of(cat(99L, "All")));
+
+        String view = controller.mainpage(null, model);
+
+        assertThat(view).isEqualTo("index");
+
+        @SuppressWarnings("unchecked")
+        List<Event> events = (List<Event>) model.getAttribute("events");
+        assertThat(events).isEmpty();
+
+        @SuppressWarnings("unchecked")
+        Map<Long, Boolean> rsvpMap = (Map<Long, Boolean>) model.getAttribute("rsvpStatusMap");
+        assertThat(rsvpMap).isEmpty();
+
+        @SuppressWarnings("unchecked")
+        var categories = (List<EventCategory>) model.getAttribute("categories");
+        assertThat(categories)
+                .extracting(EventCategory::getCategoryId, EventCategory::getName)
+                .containsExactly(tuple(99L, "All"));
+
+        // getUpcomingEvents called twice (RSVP + display path)
+        verify(eventService, times(2)).getUpcomingEvents();
+        verify(categoryService).getAllCategories();
+        verify(rsvpRepository, never()).checkUserAlreadyRsvped(anyLong(), anyLong());
         verifyNoMoreInteractions(eventService, categoryService, rsvpRepository);
     }
 
