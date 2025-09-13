@@ -22,10 +22,7 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-/* This test creates 2 categories and 2 events each linked to one of the categories, then filters 
- * the events based on one of the categories and makes sure the categoreis where updated based on
- * the newly added categories.
- */
+
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -42,6 +39,11 @@ public class MainPageControllerTest {
 
     @MockBean
     private RsvpRepository rsvpRepository;
+
+    /* This test creates 2 categories and 2 events each linked to one of the categories, then filters 
+    * the events based on one of the categories and makes sure the categoreis where updated based on
+    * the newly added categories.
+    */
 
     @Test
     void filterEventsByCategory_returnsMatchingEvents() throws Exception{
@@ -67,5 +69,26 @@ public class MainPageControllerTest {
             .andExpect(model().attribute("rsvpStatusMap", Map.of(1L, false)))
             .andExpect(view().name("index"));
 
+    }
+    /* this test checks if a category filter returns no events it can show there is no events */
+    @Test
+    void filterEventsByCategory_returnsNoEvents() throws Exception{
+         EventCategory category1 = new EventCategory(1L, "Sports");
+         EventCategory category2 = new EventCategory(2L, "Career");
+
+         List<EventCategory> categories = List.of(category1, category2);
+
+         when(categoryService.getAllCategories()).thenReturn(categories);
+         when(rsvpRepository.checkUserAlreadyRsvped(anyLong(), anyLong())).thenReturn(false);
+         when(eventService.filterEventsByCategory(2L)).thenReturn(List.of());
+
+          mvc.perform(get("/").param("categoryId", "2"))
+            .andExpect(status().isOk())
+            .andExpect(model().attribute("events", List.of()))
+            .andExpect(model().attribute("selectedCategoryId", 2L))
+            .andExpect(model().attribute("categories", categories))
+            .andExpect(model().attribute("rsvpStatusMap", Map.of()))
+            .andExpect(model().attributeExists("message")) 
+            .andExpect(view().name("index"));
     }
 }

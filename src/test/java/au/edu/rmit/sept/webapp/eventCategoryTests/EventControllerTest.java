@@ -54,7 +54,7 @@ public class EventControllerTest {
         List<EventCategory> categories = List.of(new EventCategory(1L, "Social"),
                                                 new EventCategory(2L, "Career"));
 
-        when(categoryRepository.findAll()).thenReturn(categories);
+        when(categoryService.getAllCategories()).thenReturn(categories);
 
         mvc.perform(get("/eventPage"))
             .andExpect(status().isOk())
@@ -67,7 +67,7 @@ public class EventControllerTest {
             )))
             .andExpect(model().attribute("isEdit", false));
 
-            verify(categoryRepository, times(1)).findAll();
+            verify(categoryService, times(1)).getAllCategories();
     }
 
     
