@@ -66,8 +66,8 @@ public class organiserDashboardViewAcceptanceTest {
       var dt1 = LocalDateTime.now().plusDays(1).withSecond(0).withNano(0);
       var dt2 = LocalDateTime.now().plusDays(3).withSecond(0).withNano(0);
 
-      var e1 = ev(1L, "AI Summit", "Campus A", dt1, organiserId);
-      var e2 = ev(2L, "Tech Talk", "Hall 3",   dt2, organiserId);
+      var e1 = ev(1L, "AI Summit", "Campus Bundoora", dt1, organiserId);
+      var e2 = ev(2L, "Tech Talk", "Building 80",   dt2, organiserId);
 
       // Should return sorted list of the events created by this organiser
       when(eventService.getEventsByOrganiser(organiserId)).thenReturn(List.of(e1, e2));
@@ -81,8 +81,38 @@ public class organiserDashboardViewAcceptanceTest {
             .andExpect(content().string(containsString("AI Summit")))
             .andExpect(content().string(containsString("Tech Talk")))
             .andExpect(content().string(containsString(formatter.format(dt1))))
-            .andExpect(content().string(containsString("Campus A")))
+            .andExpect(content().string(containsString("Campus Bundoora")))
             .andExpect(content().string(containsString(formatter.format(dt2))))
-            .andExpect(content().string(containsString("Hall 3")));
+            .andExpect(content().string(containsString("Building 80")));
+    }
+
+    // ---- Scenario 2: See the list of people who RSVP to the event ----------
+
+    @Test
+    void event_showListOfRsvp_withStudentInformation() throws Exception {
+      long organiserId = 5L;
+      long eventId = 6L;
+
+      var dt = LocalDateTime.now().plusDays(2).withSecond(0).withNano(0);
+      var event = ev(eventId, "Career Fair", "Building 10", dt, organiserId);
+
+      when(eventService.findEventsByIdAndOrganiser(eventId, organiserId)).thenReturn(event);
+
+      var a1 = attendee("Alice", "dummy1@gmail.com", "Confirmed");
+      var a2 = attendee("Bob",   "dummy2@gmail.com", "Cancelled");
+
+      when(rsvpService.getAllAttendeesForEvent(eventId)).thenReturn(List.of(a1, a2));
+
+      mvc.perform(get("/organiser/events/{eventId}/rsvps", eventId))
+            .andExpect(status().isOk())
+            .andExpect(view().name("organiserRsvps"))
+            .andExpect(content().string(containsString("Career Fair")))
+            .andExpect(content().string(containsString("Building 10")))
+            .andExpect(content().string(containsString("Alice")))
+            .andExpect(content().string(containsString("dummy1@gmail.com")))
+            .andExpect(content().string(containsString("Confirmed")))
+            .andExpect(content().string(containsString("Bob")))
+            .andExpect(content().string(containsString("dummy2@gmail.com")))
+            .andExpect(content().string(containsString("Cancelled")));
     }
 }
