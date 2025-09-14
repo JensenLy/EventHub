@@ -115,4 +115,20 @@ public class organiserDashboardViewAcceptanceTest {
             .andExpect(content().string(containsString("dummy2@gmail.com")))
             .andExpect(content().string(containsString("Cancelled")));
     }
+
+    // ---- Security Test for Error: event not owned / not found ---------------------------
+    @Test
+    void eventRSVP_whenNotOwnedOrMissing_byThisOrganiser() throws Exception {
+      long organiserId = 5L;
+      long eventId = 20L;
+
+      when(eventService.findEventsByIdAndOrganiser(eventId, organiserId)).thenReturn(null);
+      when(eventService.getEventsByOrganiser(organiserId)).thenReturn(List.of(ev(10L, "Test Event", "Melbourne Campus", LocalDateTime.now().plusDays(1), organiserId)));
+
+      mvc.perform(get("/organiser/events/{eventId}/rsvps", eventId))
+            .andExpect(status().isOk())
+            .andExpect(view().name("organiserDashboard"))
+            .andExpect(content().string(containsString("Event not found or not hosted by you.")))
+            .andExpect(content().string(containsString("My Event"))); // dashboard reloaded
+    }
 }
