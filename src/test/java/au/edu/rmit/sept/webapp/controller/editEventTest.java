@@ -6,9 +6,13 @@ import java.util.List;
 
 import static org.hamcrest.Matchers.containsString;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
+
 import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
@@ -22,16 +26,18 @@ import au.edu.rmit.sept.webapp.model.Event;
 import au.edu.rmit.sept.webapp.model.EventCategory;
 import au.edu.rmit.sept.webapp.service.CategoryService;
 import au.edu.rmit.sept.webapp.service.EventService;
+import au.edu.rmit.sept.webapp.service.RSVPService;
 
-
-@SpringBootTest
+@WebMvcTest(controllers = EventController.class)
 @AutoConfigureMockMvc
 public class editEventTest {
     @Autowired
     private MockMvc mvc;
 
     @MockBean
-    EventService eventService;
+    private EventService eventService;
+
+    @MockBean private RSVPService rsvpService;
 
     @MockBean
     private CategoryService categoryService;
@@ -63,10 +69,10 @@ public class editEventTest {
             100, 
             BigDecimal.ONE
             );
-            
-        when(eventService.isValidDateTime(fixedDateTime)).thenReturn(true);
-        when(eventService.findById(event.getEventId())).thenReturn(event);
 
+        when(eventService.findById(1L)).thenReturn(event);
+        when(eventService.isValidDateTime(fixedDateTime)).thenReturn(true);
+        when(eventService.updateEvent(any(Event.class), anyList())).thenReturn(1);
 
         mvc.perform(post(URL, event.getEventId())
             .param("name", "Test2")
