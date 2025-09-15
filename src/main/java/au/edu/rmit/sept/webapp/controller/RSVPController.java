@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import au.edu.rmit.sept.webapp.model.Event;
-import au.edu.rmit.sept.webapp.model.RSVP;
 import au.edu.rmit.sept.webapp.service.EventService;
 import au.edu.rmit.sept.webapp.service.RSVPService;
 
@@ -27,20 +26,19 @@ public class RSVPController {
         this.eventService = eventService;
     }
 
-    @PostMapping("/{userId}/event/{eventId}/{status}")
-    public String rsvp(@PathVariable Long userId, @PathVariable Long eventId, @PathVariable String status, RedirectAttributes redirectAttributes) {
+    @PostMapping("/{userId}/event/{eventId}/confirm")
+    public String rsvp(@PathVariable Long userId, @PathVariable Long eventId, RedirectAttributes redirectAttributes) {
         try {
-            if (rsvpService.submitRSVP(userId, eventId, status)) { //create an rsvp
+            if (rsvpService.submitRSVP(userId, eventId)) { //create an rsvp
                 //get event object for event name for success message. 
                 Event event = eventService.findById(eventId); 
-                String successMsg = "You have successfully RSVP'd (" + status + ") to " + event.getName() + "!";
+                String successMsg = "You have successfully RSVP'd to " + event.getName() + "!";
                 redirectAttributes.addFlashAttribute("successMessage", successMsg);
             }
-            else {//duplicate rsvp
+            else { //duplicate rsvp
                 //get event object for event name for error message. 
                 Event event = eventService.findById(eventId); 
-                RSVP rsvp = rsvpService.getRSVP(userId, eventId);
-                String errorMsg = "Duplicate RSVP found: \"" + rsvp.getStatus() + "\" to " + event.getName() + "!";
+                String errorMsg = "Duplicate RSVP found: " + event.getName() + "!";
                 redirectAttributes.addFlashAttribute("errorMessage", errorMsg);
             }
             return "redirect:/";
@@ -50,9 +48,12 @@ public class RSVPController {
     }
 
     @GetMapping("/{userId}/event/{eventId}")
-    public String rsvpEventPage(@PathVariable Long userId,
+    public String rsvpConfirmPage(@PathVariable Long userId,
                                 @PathVariable Long eventId,
                                 Model model) {
+
+        //TO DO: redirects to main page if already RSVPed with error message, also add extra test case for this. 
+
         Event event = eventService.findById(eventId);
         model.addAttribute("event", event);
         model.addAttribute("userId", userId);

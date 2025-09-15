@@ -87,9 +87,7 @@
             
             
             <!-- Action Buttons -->
-            <div class="card-actions">
-              <form th:action="@{'/rsvp/' + ${currentUserId} + '/event/' + ${event.eventId}}" method="get" class="rsvp-form">
-               
+            <div class="card-actions">              
               
               <!-- Organizer Actions -->
               <div class="organizer-actions" th:if="${event.createdByUserId} == ${currentUserId}">
@@ -107,13 +105,18 @@
               </div>
             </div>
           </div>  
-           <button 
+
+           <!-- RSVP Buttons -->
+              <form th:action="@{'/rsvp/' + ${currentUserId} + '/event/' + ${event.eventId}}" method="get" class="rsvp-form">
+                <button 
                   type="submit"
+                  style="width:100%"
                   th:classappend="${rsvpStatusMap[event.eventId]} ? 'btn btn-green submit-button' : 'btn btn-dark submit-button'"
                   th:disabled="${rsvpStatusMap[event.eventId]}"
                   th:text="${rsvpStatusMap[event.eventId]} ? 'RSVPed' : 'RSVP'"
                 >RSVP</button>
               </form>
+
         </article>
       </div>
       </div>

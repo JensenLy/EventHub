@@ -1,26 +1,29 @@
 package au.edu.rmit.sept.webapp.controller;
 
-import au.edu.rmit.sept.webapp.model.Event;
-import au.edu.rmit.sept.webapp.repository.RsvpRepository;
-import au.edu.rmit.sept.webapp.service.EventService;
-import au.edu.rmit.sept.webapp.service.RSVPService;
+import java.time.LocalDateTime;
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.Test;
+import static org.mockito.ArgumentMatchers.eq;
 import org.mockito.Mockito;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.web.servlet.ModelAndView;
-
-import java.time.LocalDateTime;
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import org.springframework.web.servlet.ModelAndView;
+
+import au.edu.rmit.sept.webapp.model.Event;
+import au.edu.rmit.sept.webapp.repository.RsvpRepository;
+import au.edu.rmit.sept.webapp.service.EventService;
+import au.edu.rmit.sept.webapp.service.RSVPService;
 
 
 
@@ -41,11 +44,11 @@ public class organiserDashboardControllerIntegrationTest {
     return e;
   }
 
-  private static RsvpRepository.AttendeeRow attendee(String name, String email, String status) {
+  private static RsvpRepository.AttendeeRow attendee(String name, String email) {
     var row = Mockito.mock(RsvpRepository.AttendeeRow.class);
     when(row.getName()).thenReturn(name);
     when(row.getEmail()).thenReturn(email);
-    when(row.getStatus()).thenReturn(status);
+    // when(row.getStatus()).thenReturn(status);
     return row;
   }
 
@@ -82,8 +85,8 @@ public class organiserDashboardControllerIntegrationTest {
     var event = ev(eventId, "Career Fair", LocalDateTime.now().plusDays(2), organiserId, "Building 80");
     when(eventService.findEventsByIdAndOrganiser(eventId, organiserId)).thenReturn(event);
 
-    var a1 = attendee("Alice", "dummy1@gmail.com", "Confirmed");
-    var a2 = attendee("Bob",   "dummy2@gmail.com", "Cancelled");
+    var a1 = attendee("Alice", "dummy1@gmail.com");
+    var a2 = attendee("Bob",   "dummy2@gmail.com");
     when(rsvpService.getAllAttendeesForEvent(eventId)).thenReturn(List.of(a1, a2));
 
     MvcResult result = mvc.perform(get("/organiser/events/{eventId}/rsvps", eventId))

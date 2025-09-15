@@ -1,30 +1,29 @@
 package au.edu.rmit.sept.webapp.controller;
 
-import au.edu.rmit.sept.webapp.model.Event;
-import au.edu.rmit.sept.webapp.model.RSVP;
-import au.edu.rmit.sept.webapp.repository.RsvpRepository;
-import au.edu.rmit.sept.webapp.service.EventService;
-import au.edu.rmit.sept.webapp.service.RSVPService;
-
-import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.web.servlet.MockMvc;
-
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Locale;
 
 import static org.hamcrest.Matchers.containsString;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import static org.mockito.Mockito.when;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.web.servlet.MockMvc;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
+
+import au.edu.rmit.sept.webapp.model.Event;
+import au.edu.rmit.sept.webapp.repository.RsvpRepository;
+import au.edu.rmit.sept.webapp.service.EventService;
+import au.edu.rmit.sept.webapp.service.RSVPService;
 
 
 @SpringBootTest
@@ -50,11 +49,10 @@ public class organiserDashboardViewAcceptanceTest {
     }
 
   // Helper to create RSVPs
-    private static RsvpRepository.AttendeeRow attendee(String name, String email, String status) {
+    private static RsvpRepository.AttendeeRow attendee(String name, String email) {
         var row = Mockito.mock(RsvpRepository.AttendeeRow.class);
         when(row.getName()).thenReturn(name);
         when(row.getEmail()).thenReturn(email);
-        when(row.getStatus()).thenReturn(status);
         return row;
     }
 
@@ -98,8 +96,8 @@ public class organiserDashboardViewAcceptanceTest {
 
       when(eventService.findEventsByIdAndOrganiser(eventId, organiserId)).thenReturn(event);
 
-      var a1 = attendee("Alice", "dummy1@gmail.com", "Confirmed");
-      var a2 = attendee("Bob",   "dummy2@gmail.com", "Cancelled");
+      var a1 = attendee("Alice", "dummy1@gmail.com");
+      var a2 = attendee("Bob",   "dummy2@gmail.com");
 
       when(rsvpService.getAllAttendeesForEvent(eventId)).thenReturn(List.of(a1, a2));
 
@@ -110,10 +108,10 @@ public class organiserDashboardViewAcceptanceTest {
             .andExpect(content().string(containsString("Building 10")))
             .andExpect(content().string(containsString("Alice")))
             .andExpect(content().string(containsString("dummy1@gmail.com")))
-            .andExpect(content().string(containsString("Confirmed")))
+            // .andExpect(content().string(containsString("Confirmed")))
             .andExpect(content().string(containsString("Bob")))
-            .andExpect(content().string(containsString("dummy2@gmail.com")))
-            .andExpect(content().string(containsString("Cancelled")));
+            .andExpect(content().string(containsString("dummy2@gmail.com")));
+            // .andExpect(content().string(containsString("Cancelled")));
     }
 
     // ---- Security Test for Error: event not owned / not found ---------------------------

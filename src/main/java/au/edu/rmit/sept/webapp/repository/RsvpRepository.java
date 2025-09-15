@@ -23,18 +23,17 @@ public class RsvpRepository {
             rs.getLong("rsvp_id"),
             rs.getLong("user_id"),
             rs.getLong("event_id"),
-            rs.getString("status"),
             rs.getTimestamp("created_at").toLocalDateTime()
         );
 
     public List<RSVP> findByEventId(Long eventId) {
-        String sql = "SELECT rsvp_id, user_id, event_id, status, created_at FROM rsvp WHERE event_id = ?";
+        String sql = "SELECT rsvp_id, user_id, event_id, created_at FROM rsvp WHERE event_id = ?";
         return jdbcTemplate.query(sql, MAPPER, eventId);
     }
 
     public boolean save(RSVP rsvp) {
-        String sql = "INSERT INTO rsvp (user_id, event_id, status, created_at) VALUES (?, ?, ?, ?)";
-        boolean status = jdbcTemplate.update(sql, rsvp.getUserId(), rsvp.getEventId(), rsvp.getStatus(), rsvp.getCreatedAt()) > 0;
+        String sql = "INSERT INTO rsvp (user_id, event_id, created_at) VALUES (?, ?, ?)";
+        boolean status = jdbcTemplate.update(sql, rsvp.getUserId(), rsvp.getEventId(), rsvp.getCreatedAt()) > 0;
         return status;
     }
 
@@ -45,7 +44,7 @@ public class RsvpRepository {
     }
 
     public RSVP findByUserIdAndEventId(Long userId, Long eventId) {
-        String sql = "SELECT rsvp_id, user_id, event_id, status, created_at FROM rsvp WHERE user_id = ? AND event_id = ?";
+        String sql = "SELECT rsvp_id, user_id, event_id, created_at FROM rsvp WHERE user_id = ? AND event_id = ?";
         List<RSVP> rsvps = jdbcTemplate.query(sql, MAPPER, userId, eventId);
         return rsvps.isEmpty() ? null : rsvps.get(0);
     }
@@ -65,25 +64,23 @@ public class RsvpRepository {
     public static class AttendeeRow {
       private final String name;
       private final String email;
-      private final String status;
-      public AttendeeRow(String name, String email, String status) {
-        this.name = name; this.email = email; this.status = status;
+      public AttendeeRow(String name, String email) {
+        this.name = name; this.email = email;
       }
       public String getName() { return name; }
       public String getEmail() { return email; }
-      public String getStatus() { return status; }
     }
 
     public List<AttendeeRow> findAttendeesByEvent(Long eventId) {
       String sql = """
-          SELECT u.name, u.email, r.status
+          SELECT u.name, u.email
           FROM rsvp r
           JOIN users u ON u.user_id = r.user_id
           WHERE r.event_id = ?
           ORDER BY u.name ASC
           """;
       return jdbcTemplate.query(sql, ps -> ps.setLong(1, eventId),
-            (rs, i) -> new AttendeeRow(rs.getString("name"), rs.getString("email"), rs.getString("status"))
+            (rs, i) -> new AttendeeRow(rs.getString("name"), rs.getString("email"))
             );
     }
 }

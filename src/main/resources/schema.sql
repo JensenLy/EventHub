@@ -44,7 +44,6 @@ CREATE TABLE rsvp (
   rsvp_id IDENTITY PRIMARY KEY,
   user_id BIGINT NOT NULL,
   event_id BIGINT NOT NULL,
-  status VARCHAR(50) NOT NULL CHECK (status IN ('going', 'not_attend', 'cancelled')),
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
   CONSTRAINT fk_rsvp_user FOREIGN KEY (user_id) REFERENCES users(user_id),

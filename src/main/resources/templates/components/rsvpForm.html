@@ -1,9 +1,12 @@
 <div th:fragment="rsvpForm">
-  <form id="rsvpForm" th:action="@{'/rsvp/' + ${userId} + '/event/' + ${event.eventId}}" th:object="${event}" method="post">
+  <form id="rsvpForm" th:action="@{'/rsvp/' + ${userId} + '/event/' + ${event.eventId} + '/confirm'}" 
+                      th:object="${event}" 
+                      method="post"
+                      onsubmit="return confirm('Are you sure you want to submit your RSVP?');">
     <input type="hidden" th:field="*{eventId}" />
     <div class="formFields">
       <div class="formTitle formTitle-center">
-        <h1 th:text="'RSVP Form'"></h1>
+        <h1 th:text="'Event Information'"></h1>
       </div>
 
       <div>
@@ -60,26 +63,6 @@
         <input type="text" id="price" th:field="*{price}" step="any" required disabled/>
       </div>
 
-      <div>
-        <label for="price">Price</label>
-        <input type="text" id="price" th:field="*{price}" step="any" required disabled/>
-      </div>
-
-      <div>
-        <label for="rsvpStatus">Please choose your RSVP Status</label>
-        <label>
-            <input id= "rsvpStatus" type="radio" name="status" value="going" /> Going
-        </label>
-
-        <label>
-            <input id= "rsvpStatus" type="radio" name="status" value="not_attend" /> Not Attend
-        </label>
-
-        <label>
-            <input id= "rsvpStatus" type="radio" name="status" value="cancelled" /> Cancelled
-        </label>
-      </div>
-
     </div>
       <div class="saveEvent">
         <a th:href="@{/}"> Cancel </a>
@@ -90,23 +73,6 @@
     </div>
   </form>
 
-  <script th:inline="javascript">
-    document.getElementById('rsvpForm').addEventListener('submit', function(e) {
-        e.preventDefault(); // stop default submit
-        const selected = document.querySelector('input[name="status"]:checked');
-        console.log("before if statement")
-        if (selected) {
-            // Build URL dynamically
-            const userId = /*[[${userId}]]*/ '1';
-            const eventId = /*[[${event.eventId}]]*/ '2';
-            this.action = `/rsvp/${userId}/event/${eventId}/${selected.value}`;
-            this.submit();
-        } else {
-            alert('Please select a status');
-        }
-        console.log("after if statement")
-    });
-  </script>
 </div>
 
 

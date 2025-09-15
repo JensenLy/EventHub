@@ -95,12 +95,12 @@ public class rsvpIntegrationTest {
         when(eventService.findById(3L)).thenReturn(event);
 
         //Mock RSVP Submission 
-        when(rsvpService.submitRSVP(2L, 3L, "not_attend")).thenReturn(true);
+        when(rsvpService.submitRSVP(2L, 3L)).thenReturn(true);
 
-        mvc.perform(post("/rsvp/2/event/3/not_attend"))
+        mvc.perform(post("/rsvp/2/event/3/confirm"))
         .andExpect(status().is3xxRedirection())
         .andExpect(redirectedUrl("/"))
-        .andExpect(flash().attribute("successMessage", "You have successfully RSVP'd (not_attend) to Test!"));
+        .andExpect(flash().attribute("successMessage", "You have successfully RSVP'd to Test!"));
     }
 
     @Test
@@ -134,21 +134,20 @@ public class rsvpIntegrationTest {
             0L,
             1L,
             5L,
-            "going",
             fixedDateTime
         );
         when(rsvpService.getRSVP(1L,5L)).thenReturn(rsvp); 
 
         //Mock RSVP Submission 
-        when(rsvpService.submitRSVP(1L, 5L, "cancelled")).thenReturn(false);
+        when(rsvpService.submitRSVP(1L, 5L)).thenReturn(false);
 
-        mvc.perform(post("/rsvp/1/event/5/going"))
+        mvc.perform(post("/rsvp/1/event/5/confirm"))
            .andExpect(status().is3xxRedirection())
            .andExpect(redirectedUrl("/"))
-           .andExpect(flash().attribute("errorMessage", "Duplicate RSVP found: \"going\" to Test!")); // error messages for duplicates
+           .andExpect(flash().attribute("errorMessage", "Duplicate RSVP found: Test!")); // error messages for duplicates
 
         // Verify service was called
-        verify(rsvpService).submitRSVP(1L, 5L, "going");
+        verify(rsvpService).submitRSVP(1L, 5L);
         verify(eventService).findById(5L);
     }
 }
