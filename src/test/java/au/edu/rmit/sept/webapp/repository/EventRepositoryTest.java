@@ -130,4 +130,44 @@ class EventRepositoryTest {
     boolean notMatchLocation = repo.checkEventExists(5L, "Cloud Career Panel", List.of("Career"), "Test Location");
     assertFalse(notMatchLocation);
   }
+  @Test
+    void findEventsByOrganiser_returnsOnlyFuture_sortedAscending() {
+        // organiser 5L owns the seeded events (one past + multiple future)
+        List<Event> list = repo.findEventsByOrganiser(5L);
+        assertFalse(list.isEmpty());
+
+        // no past ones
+        assertTrue(list.stream().allMatch(e -> e.getDateTime().isAfter(LocalDateTime.now().minusSeconds(1))));
+
+        // ascending order
+        for (int i = 1; i < list.size(); i++) {
+            assertFalse(list.get(i).getDateTime().isBefore(list.get(i - 1).getDateTime()));
+        }
+    }
+
+  @Test
+  void findEventsByIdAndOrganiser_returnsNull_forWrongOwner() {
+      // Grab one event id owned by organiser 5
+      Long someEventId = jdbc.queryForObject(
+          "SELECT event_id FROM events WHERE created_by_user_id = 5 LIMIT 1",
+          Long.class
+      );
+      assertNotNull(someEventId);
+
+      // Asking as a different organiser should return null
+      Event shouldBeNull = repo.findEventsByIdAndOrganiser(someEventId, 999L);
+      assertNull(shouldBeNull);
+  }
+
+  @Test
+  void findEventsByIdAndOrganiser_returnsEvent_forCorrectOwner() {
+      Long someEventId = jdbc.queryForObject(
+          "SELECT event_id FROM events WHERE created_by_user_id = 5 LIMIT 1",
+          Long.class
+      );
+      Event e = repo.findEventsByIdAndOrganiser(someEventId, 5L);
+      assertNotNull(e);
+      assertEquals(someEventId, e.getEventId());
+      assertEquals(5L, e.getCreatedByUserId());
+    }
 }
