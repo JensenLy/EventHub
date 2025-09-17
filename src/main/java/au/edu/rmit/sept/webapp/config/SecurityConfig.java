@@ -16,6 +16,12 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableWebSecurity
 public class SecurityConfig {
 
+    private final CustomAuthenticationSuccessHandler customAuthenticationSuccessHandler;
+
+    public SecurityConfig(CustomAuthenticationSuccessHandler customAuthenticationSuccessHandler) {
+        this.customAuthenticationSuccessHandler = customAuthenticationSuccessHandler;
+    }
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         //so basically this is where we configure the security for our web app where we only 
@@ -23,14 +29,16 @@ public class SecurityConfig {
         http
             .authorizeHttpRequests((requests) -> requests
                 // .requestMatchers("/", "/home", "/styles.css", "/favicon.svg", "/static/**", "/error", "/h2-console/**", "/*.jpg", "/*.jpeg").permitAll() // Public pages
-                .requestMatchers("/", "/home", "/css/**", "/js/**", "/images/**", "/*.css", "/*.js", "/*.jpg", "/*.jpeg", "/*.png", "/*.gif", "/*.ico",  "/*.svg", "/static/**", "/error", "/h2-console/**").permitAll()
+                .requestMatchers("/", "/home", "/css/**", "/js/**", "/images/**", "/*.css", "/*.js", "/*.jpg", "/*.jpeg", "/*.png", "/*.gif", "/*.ico",  "/*.svg", "/static/**", "/error").permitAll()
                 .requestMatchers("/h2-console/**").permitAll()
 
                 .requestMatchers("/eventPage/**").authenticated() // Protected pages
-                .requestMatchers("/organiser/**").authenticated()
+                // .requestMatchers("/organiser/**").authenticated()
+                .requestMatchers("/organiser/**").hasAnyRole("ORGANISER", "ADMIN")// only organiser and admin can access organiser pages
                 .anyRequest().authenticated()
             )
             .formLogin(form -> form
+            .successHandler(customAuthenticationSuccessHandler)
                 .permitAll() // Use default Spring Security login form
             )
             .logout(logout -> logout
@@ -52,20 +60,51 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
-    @Bean
+     @Bean
     public UserDetailsService userDetailsService() {
         UserDetails user = User.builder()
-            .username("user")
-            .password(passwordEncoder().encode("password"))
+            .username("dummy@example.com")
+            .password(passwordEncoder().encode("password123"))
             .roles("USER")
             .build();
 
-        UserDetails admin = User.builder()
-            .username("admin")
-            .password(passwordEncoder().encode("admin"))
-            .roles("ADMIN", "USER")
+          UserDetails user2 = User.builder()
+            .username("dummy2@example.com")
+            .password(passwordEncoder().encode("password123"))
+            .roles("USER")
             .build();
 
-        return new InMemoryUserDetailsManager(user, admin);
+          UserDetails user3 = User.builder()
+            .username("dummy3@example.com")
+            .password(passwordEncoder().encode("password123"))
+            .roles("USER")
+            .build();
+
+          UserDetails user4 = User.builder()
+            .username("dummy4@example.com")
+            .password(passwordEncoder().encode("password123"))
+            .roles("USER")
+            .build();
+
+
+        UserDetails organiser = User.builder()
+            .username("dummy5@example.com")
+            .password(passwordEncoder().encode("password123"))
+            .roles("ORGANISER")
+            .build();
+
+        UserDetails organiser2 = User.builder()
+            .username("dummy6@example.com")
+            .password(passwordEncoder().encode("password123"))
+            .roles("ORGANISER")
+            .build();
+
+            UserDetails admin = User.builder()
+            .username("dummy7@example.com")
+            .password(passwordEncoder().encode("password123"))
+            .roles("ADMIN")
+            .build();
+
+        return new InMemoryUserDetailsManager(user, user2 , user3, user4 ,organiser, organiser2 ,  admin);
     }
 }
