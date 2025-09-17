@@ -35,6 +35,8 @@ public class SecurityConfig {
                 .requestMatchers("/eventPage/**").authenticated() // Protected pages
                 // .requestMatchers("/organiser/**").authenticated()
                 .requestMatchers("/organiser/**").hasAnyRole("ORGANISER", "ADMIN")// only organiser and admin can access organiser pages
+
+                .requestMatchers("/users/**").hasRole("ADMIN")
                 .anyRequest().authenticated()
             )
             .formLogin(form -> form
