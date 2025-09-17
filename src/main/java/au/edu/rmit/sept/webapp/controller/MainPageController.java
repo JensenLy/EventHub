@@ -15,6 +15,7 @@ import au.edu.rmit.sept.webapp.model.EventCategory;
 import au.edu.rmit.sept.webapp.model.User;
 import au.edu.rmit.sept.webapp.repository.RsvpRepository;
 import au.edu.rmit.sept.webapp.service.CategoryService;
+import au.edu.rmit.sept.webapp.service.CurrentUserService;
 import au.edu.rmit.sept.webapp.service.EventService;
 import au.edu.rmit.sept.webapp.service.UserService;
 
@@ -24,16 +25,18 @@ public class MainPageController {
   private final RsvpRepository rsvpRepository;
   private  final CategoryService categoryService;
 
-  private final UserService userService;
+  // private final UserService userService;
+  private final CurrentUserService currentUserService;
+
   
   public MainPageController(EventService eventService, RsvpRepository rsvpRepository, CategoryService categoryService
   
-  , UserService userService) {
+  , CurrentUserService currentUserService) {
     this.eventService = eventService;
     this.rsvpRepository = rsvpRepository;
     this.categoryService = categoryService;
 
-    this.userService = userService;
+    this.currentUserService = currentUserService;
   }
 
   @GetMapping("/")
@@ -41,20 +44,8 @@ public class MainPageController {
   
   ,Principal principal) {
     List<Event> events = eventService.getUpcomingEvents();
-    
-    Long currentUserId = null;
-        if (principal != null) {
-      String email = principal.getName(); // This gets the username (email in our case)
-      User currentUser = userService.getUserByEmail(email);
-      if (currentUser != null) {
-        currentUserId = currentUser.getUserId();
-      }
-    }
+Long currentUserId = currentUserService.getCurrentUserId();
 
-        // Fallback to default user if no user is logged in or user not found
-    if (currentUserId == null) {
-      currentUserId = 5L; 
-    }
 
 
     

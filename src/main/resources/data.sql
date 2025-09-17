@@ -49,6 +49,11 @@ WHERE e.name='Cloud Career Panel' AND c.name='Career';
 INSERT INTO events (name, description, created_by_user_id, date_time, location, capacity, price)
 VALUES ('Hack Night', 'Bring your laptop', 5, DATEADD('DAY', 1, CURRENT_TIMESTAMP), 'Fab Lab', 80, 0.00);
 
+
+
+INSERT INTO events (name, description, created_by_user_id, date_time, location, capacity, price)
+VALUES ('SUPER STAR', 'Become a model', 6, DATEADD('DAY', 1, CURRENT_TIMESTAMP), 'Fab Lab', 400, 0.00);
+
 -- Hack Night → Hackathon
 INSERT INTO event_categories (event_id, category_id)
 SELECT e.event_id, c.category_id
