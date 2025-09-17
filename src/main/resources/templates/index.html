@@ -22,11 +22,11 @@
             <a href="#" class="btn btn-dark">Register</a>
           </div>
         </div>
-        <div class="hero-media">
-          <div class="media-placeholder">
-            <div class="media-icon">
-              <img class="hero-image" th:src="@{/homePage.jpg}" alt="Home page image">
-            </div>
+      </div>
+      <div class="hero-media">
+        <div class="media-placeholder">
+          <div class="hero-wrap">
+            <img class="hero-img" th:src="@{/homePage.jpg}" alt="Home page image">
           </div>
         </div>
       </div>
@@ -42,9 +42,9 @@
   
       </div>
 
-      <div class="createEventBtn">
+      <!-- <div class="createEventBtn">
         <a  th:href="@{/eventPage}" class="btn btn-dark"> Create Event </a>
-      </div>
+      </div> -->
 
       <!-- Showing event cards-->
       <div class="cards">
@@ -75,29 +75,6 @@
               <span class="meta-item">📅 <span th:text="${#temporals.format(event.dateTime, 'MMM d')}">Date</span></span>
               <span class="meta-item">📍 <span th:text="${event.location}">Location</span></span>
             </div>
-            <p
-              class="card-text"
-              th:text="${event.description != null ? event.description : 'Body text.'}"
-            />
-            <div th:if="${event.createdByUserId == currentUserId}">
-              <a th:href="@{'/event/edit/' + ${event.eventId}}" class="btn btn-light">Edit</a>
-              <form th:action="@{'/event/delete/' + ${event.eventId}}" method="post" style="display:inline;">
-                  <button type="submit" onclick="return confirm('Are you sure you want to delete this event?');" class="btn">Delete</button>
-              </form>
-            
-            
-            <!-- Action Buttons -->
-            <!-- <div class="card-actions">               -->
-              
-              <!-- Organizer Actions -->
-              <!-- <div class="organizer-actions" th:if="${event.createdByUserId} == ${currentUserId}">
-                <a th:href="@{'/event/edit/' + ${event.eventId}}" class="btn btn-outline btn-light  btn-sm">Edit</a>
-                <form th:action="@{'/event/delete/' + ${event.eventId}}" method="post" style="display:inline;">
-                  <button type="submit" onclick="return confirm('Are you sure you want to delete this event?');" class="btn btn-danger btn-sm">Delete</button>
-                </form>
-              </div>
-            </div> -->
-          </div>
           <div class="card-media">
             <div class="img-placeholder">
               <div class="placeholder-icon">
@@ -106,7 +83,7 @@
             </div>
           </div>  
 
-           <!-- RSVP Buttons -->
+          <!-- RSVP Buttons -->
               <form th:action="@{'/rsvp/' + ${currentUserId} + '/event/' + ${event.eventId}}" method="get" class="rsvp-form">
                 <button 
                   type="submit"
@@ -116,6 +93,17 @@
                   th:text="${rsvpStatusMap[event.eventId]} ? 'RSVPed' : 'RSVP'"
                 >RSVP</button>
               </form>
+              <div th:if = "${rsvpStatusMap[event.eventId]}">
+                <form th:action="@{'/rsvp/' + ${currentUserId} + '/event/' + ${event.eventId} + '/delete'}" method="post"
+                      onsubmit="return confirm('Are you sure you want to DELETE this RSVP ?');">
+                  <button 
+                    type="submit"
+                    style="width:100%"
+                    class="btn submit-button"
+                    th:text="'Cancel this RSVP'"
+                  >Cancel this RSVP</button>
+                </form>
+              </div>
 
         </article>
       </div>
