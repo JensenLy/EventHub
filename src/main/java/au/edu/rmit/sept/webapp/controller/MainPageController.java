@@ -1,6 +1,4 @@
 package au.edu.rmit.sept.webapp.controller;
-
-import java.security.Principal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -12,12 +10,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import au.edu.rmit.sept.webapp.model.Event;
 import au.edu.rmit.sept.webapp.model.EventCategory;
-import au.edu.rmit.sept.webapp.model.User;
 import au.edu.rmit.sept.webapp.repository.RsvpRepository;
 import au.edu.rmit.sept.webapp.service.CategoryService;
 import au.edu.rmit.sept.webapp.service.CurrentUserService;
 import au.edu.rmit.sept.webapp.service.EventService;
-import au.edu.rmit.sept.webapp.service.UserService;
 
 @Controller
 public class MainPageController {
@@ -40,15 +36,11 @@ public class MainPageController {
   }
 
   @GetMapping("/")
-  public String mainpage(@RequestParam(name = "categoryId", required = false) Long categoryId, Model model 
-  
-  ,Principal principal) {
+  public String mainpage(@RequestParam(name = "categoryId", required = false) Long categoryId, Model model ) {
     List<Event> events = eventService.getUpcomingEvents();
 Long currentUserId = currentUserService.getCurrentUserId();
 
 
-
-    
     // Map to hold RSVP status for each event
     Map<Long, Boolean> rsvpStatusMap = new HashMap<>();
     for (Event event : events) {
