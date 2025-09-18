@@ -1,6 +1,7 @@
 package au.edu.rmit.sept.webapp.controller;
 
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -82,5 +83,13 @@ public class RSVPController {
 
         return "rsvpPage"; 
     }
+
+    @GetMapping("/{userId}/my-rsvps")
+        public String myRsvpsPage(@PathVariable Long userId, Model model) {
+        List<Event> events = rsvpService.getRsvpedEventsByUser(userId);
+        model.addAttribute("events", events);
+        model.addAttribute("userId", userId);
+        return "myRsvps"; 
+}
 }
 

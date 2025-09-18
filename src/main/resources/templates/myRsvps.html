@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>My RSVPs</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}" />
+</head>
+<body>
+   <header th:replace="~{components/header :: header}"></header>
+   <div th:if="${events.isEmpty()}">
+        <p>You haven't RSVP'd to any events yet.</p>
+    </div>
+    <h1>My RSVPs Placeholder</h1>
+    <p>List of events will appear here.</p>
+<div th:each="event : ${events}" class="event-card">
+        <h2 th:text="${event.name}">Event Name</h2>
+        <p th:text="${event.description}">Event Description</p>
+        <p>
+            Date: <span th:text="${#dates.format(event.dateTime,'yyyy-MM-dd HH:mm')}">Event Date</span>
+        </p>
+        <p>
+            Location: <span th:text="${event.location}">Event Location</span>
+        </p>
+        <p>
+            Categories: <span th:text="${event.category}">Categories</span>
+        </p>
+        <p>
+            Price: <span th:text="${event.price}">Price</span>
+        </p>
+
+        <!-- Cancel RSVP button -->
+        <form th:action="@{/rsvp/{userId}/event/{eventId}/delete(userId=${userId}, eventId=${event.eventId})}" 
+              method="post" 
+              onsubmit="return confirm('Are you sure you want to cancel this RSVP?');">
+            <button type="submit" class="btn btn-red" style="width:100%">Cancel RSVP</button>
+        </form>
+    </div>
+</div>
+
+    <footer th:replace="~{components/footer :: footer}"> </footer>
+
+</body>
+</html>

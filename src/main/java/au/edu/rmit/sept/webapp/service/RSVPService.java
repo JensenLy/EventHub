@@ -7,7 +7,8 @@ import org.springframework.stereotype.Service;
 
 import au.edu.rmit.sept.webapp.model.RSVP;
 import au.edu.rmit.sept.webapp.repository.RsvpRepository;
-
+import au.edu.rmit.sept.webapp.model.Event;
+import org.springframework.web.bind.annotation.ResponseBody;
 @Service
 public class RSVPService {
 
@@ -42,5 +43,9 @@ public class RSVPService {
 
     public List<RsvpRepository.AttendeeRow> getAllAttendeesForEvent(Long eventId) {
       return rsvpRepository.findAttendeesByEvent(eventId);
+    }
+
+    public List<Event> getRsvpedEventsByUser(Long userId){
+        return rsvpRepository.findEventsByUserId(userId);
     }
 }

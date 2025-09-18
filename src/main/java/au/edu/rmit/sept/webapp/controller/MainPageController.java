@@ -30,7 +30,7 @@ public class MainPageController {
   @GetMapping("/")
   public String mainpage(@RequestParam(name = "categoryId", required = false) Long categoryId, Model model) {
     List<Event> events = eventService.getUpcomingEvents();
-    Long currentUserId = 5L; // placeholder user
+    Long currentUserId = 1L; // placeholder user
     
     // Map to hold RSVP status for each event
     Map<Long, Boolean> rsvpStatusMap = new HashMap<>();
