@@ -112,8 +112,8 @@ public class RsvpRepository {
         for(Event event : events){
             String catSql = """
                     SELECT c.name
-                    FROM category c
-                    JOIN event_category ec ON c.category_id = ec.category_id
+                    FROM categories c
+                    JOIN event_categories ec ON c.category_id = ec.category_id
                     WHERE ec.event_id = ?
                     """;
 
