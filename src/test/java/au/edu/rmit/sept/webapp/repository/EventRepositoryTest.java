@@ -69,26 +69,27 @@ class EventRepositoryTest {
       );
   }
 
-  private int countJoinRows(Long eventId) {
-    Integer c = jdbc.queryForObject("SELECT COUNT(*) FROM event_categories WHERE event_id = ?", Integer.class, eventId);
-    return c == null ? 0 : c;
-  }
+    private int countJoinRows(Long eventId) {
+      Integer c = jdbc.queryForObject("SELECT COUNT(*) FROM event_categories WHERE event_id = ?", Integer.class, eventId);
+      return c == null ? 0 : c;
+    }
 
-  private Event baseEvent(String name, String location, LocalDateTime when) {
-    Event e = new Event();
-    e.setName(name);
-    e.setDesc("desc for " + name);
-    e.setCreatedByUserId(5L);
-    e.setDateTime(when);
-    e.setLocation(location);
-    e.setCapacity(100);
-    e.setPrice(new BigDecimal("0.00"));
-    return e;
-  }
+    private Event baseEvent(String name, String location, LocalDateTime when) {
+      Event e = new Event();
+      e.setName(name);
+      e.setDesc("desc for " + name);
+      e.setCreatedByUserId(5L);
+      e.setDateTime(when);
+      e.setLocation(location);
+      e.setCapacity(100);
+      e.setPrice(new BigDecimal("0.00"));
+      return e;
+    }
 
-  private Map<String, Object> loadEventRow(long eventId) {
-    return jdbc.queryForMap("SELECT * FROM events WHERE event_id = ?", eventId);
-}
+    private Map<String, Object> loadEventRow(long eventId) {
+      return jdbc.queryForMap("SELECT * FROM events WHERE event_id = ?", eventId);
+    }
+
 
   @Test
   void findUpcomingEventsSorted_filtersPast_ordersAsc_andAggregatesCategories() {
@@ -187,10 +188,11 @@ class EventRepositoryTest {
     e.setLocation("Building 80");
     e.setCapacity(100);
     e.setPrice(new BigDecimal("0.00"));
+    e.setDetailedDescription("Deep dive into AI topics.");
     e.setAgenda(agenda);
     e.setSpeakers("Prof. X, Dr. Y");
     e.setDressCode("Smart Casual");
-    List<String> categoryNames = List.of("Tech", "Career");
+    List<String> categoryNames = List.of("Hackathon", "Career");
 
     Event saved = repo.createEventWithAllExtraInfo(e, categoryNames);
 
@@ -200,12 +202,12 @@ class EventRepositoryTest {
     // Assert: fields persisted
     Map<String, Object> row = loadEventRow(saved.getEventId());
     assertEquals("AI Night", row.get("name"));
-    assertEquals("Short desc", row.get("description"));
-    assertEquals("B80 Theatre", row.get("location"));
+    assertEquals("Evening event", row.get("description"));
+    assertEquals("Building 80", row.get("location"));
     assertEquals("Deep dive into AI topics.", row.get("detailed_description"));
-    assertEquals("6:00 PM – Check-in\n6:30 PM – Keynote\n7:00 PM – Panel\n8:00 PM – Networking", row.get("agenda"));
+    assertEquals("17:30 - Registration\n18:00 - Opening\n19:00 - Key Takeaways", row.get("agenda"));
     assertEquals("Prof. X, Dr. Y", row.get("speakers"));
-    assertEquals("Smart casual", row.get("dress_code"));
+    assertEquals("Smart Casual", row.get("dress_code"));
 
     // Assert: categories joined
     List<Long> joinIds = categoryIdsForEvent(saved.getEventId());

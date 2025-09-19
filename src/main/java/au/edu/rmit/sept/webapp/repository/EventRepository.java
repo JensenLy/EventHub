@@ -346,6 +346,50 @@ public class EventRepository {
     ));
     return list.isEmpty() ? null : list.get(0);
   }
+
+  public Event createEventWithAllExtraInfo(Event event, List<String> categoryNames) {
+    final String sql = """
+        INSERT INTO events (name, description, created_by_user_id, date_time, location, capacity, price,
+                            detailed_description, agenda, speakers, dress_code)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """;
+
+    KeyHolder keyHolder = new GeneratedKeyHolder();
+
+    jdbcTemplate.update(con -> {
+        var ps = con.prepareStatement(sql, new String[]{"event_id"});
+        ps.setString(1, event.getName());
+        ps.setString(2, event.getDescription());
+        ps.setObject(3, event.getCreatedByUserId()); // nullable
+        ps.setObject(4, event.getDateTime());
+        ps.setString(5, event.getLocation());
+        ps.setObject(6, event.getCapacity());
+        ps.setBigDecimal(7, event.getPrice());
+        ps.setString(8, event.getDetailedDescription());
+        ps.setString(9, event.getAgenda());
+        ps.setString(10, event.getSpeakers());
+        ps.setString(11, event.getDressCode());
+        return ps;
+    }, keyHolder);
+
+    Number key = keyHolder.getKey();
+    if (key != null) {
+        event.setEventId(key.longValue());
+    }
+
+    // Map category names -> ids and insert into join table
+    if (categoryNames != null && !categoryNames.isEmpty()) {
+        String placeholder = categoryNames.stream().map(n -> "?").collect(java.util.stream.Collectors.joining(", "));
+        String categoryIdSql = "SELECT category_id FROM categories WHERE name IN (" + placeholder + ")";
+        List<Long> categoryIds = jdbcTemplate.query(categoryIdSql, categoryNames.toArray(), (rs, i) -> rs.getLong(1));
+
+        String joinSql = "INSERT INTO event_categories(event_id, category_id) VALUES (?, ?)";
+        for (Long catId : categoryIds) {
+            jdbcTemplate.update(joinSql, event.getEventId(), catId);
+        }
+    }
+    return event;
+}
 }
 
 
