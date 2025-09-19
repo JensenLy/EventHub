@@ -125,7 +125,7 @@ public class EventController {
 
       eventService.saveEventWithCategories(event, categoryIds);
       redirectAttributes.addFlashAttribute("successMessage", "Event created successfully!");
-      return "redirect:/";
+      return "redirect:/organiser/dashboard";
   }
 
     // Edit form
@@ -167,7 +167,7 @@ public class EventController {
         event.setCreatedByUserId(5L);
         eventService.updateEvent(event, categoryIds);
         redirectAttributes.addFlashAttribute("successMessage", "Event updated successfully!");
-        return "redirect:/";
+        return "redirect:/organiser/dashboard";
     }
 
     @PostMapping("/event/delete/{id}")
@@ -176,7 +176,7 @@ public class EventController {
       rsvpService.deleteRsvpByEvent(eventId);
       eventService.deleteEventbyId(eventId);
       redirectAttributes.addFlashAttribute("successMessage", "Event deleted successfully!");
-      return "redirect:/";
+      return  "redirect:/organiser/dashboard";
     }
 
     @PostMapping("/category/delete/{id}")
