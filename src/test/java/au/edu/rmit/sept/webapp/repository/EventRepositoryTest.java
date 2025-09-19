@@ -90,6 +90,13 @@ class EventRepositoryTest {
       return jdbc.queryForMap("SELECT * FROM events WHERE event_id = ?", eventId);
     }
 
+    private List<Long> categoryIdsForNames(List<String> names) {
+      if (names == null || names.isEmpty()) return List.of();
+      String placeholders = String.join(",", names.stream().map(n -> "?").toList());
+      String sql = "SELECT category_id FROM categories WHERE name IN (" + placeholders + ")";
+      return jdbc.query(sql, names.toArray(), (rs, i) -> rs.getLong("category_id"));
+    }
+
 
   @Test
   void findUpcomingEventsSorted_filtersPast_ordersAsc_andAggregatesCategories() {
@@ -192,9 +199,9 @@ class EventRepositoryTest {
     e.setAgenda(agenda);
     e.setSpeakers("Prof. X, Dr. Y");
     e.setDressCode("Smart Casual");
-    List<String> categoryNames = List.of("Hackathon", "Career");
+    List<Long> categoryIdsCreated = categoryIdsForNames(List.of("Career", "Hackathon"));
 
-    Event saved = repo.createEventWithAllExtraInfo(e, categoryNames);
+    Event saved = repo.createEventWithAllExtraInfo(e, categoryIdsCreated);
 
     assertNotNull(saved.getEventId());
     assertTrue(saved.getEventId() > 0);
@@ -231,7 +238,8 @@ class EventRepositoryTest {
       e.setSpeakers("Host Team");
       e.setDressCode("Casual");
 
-      Event saved = repo.createEventWithAllExtraInfo(e, List.of("Career", "Hackathon"));
+      List<Long> categoryIdsCreated = categoryIdsForNames(List.of("Career", "Hackathon"));
+      Event saved = repo.createEventWithAllExtraInfo(e, categoryIdsCreated);
       long eventId = saved.getEventId();
 
       // Now update several fields + categories
@@ -247,7 +255,8 @@ class EventRepositoryTest {
       saved.setSpeakers("Jane Doe, John Smith");
       saved.setDressCode("Business casual");
 
-      int rows = repo.updateEventWithAllExtraInfo(saved, List.of("Social")); // swap categories
+      List<Long> categoryIdsUpdated = categoryIdsForNames(List.of("Social"));
+      int rows = repo.updateEventWithAllExtraInfo(saved, categoryIdsUpdated); // swap categories
       assertEquals(1, rows);
 
       Map<String, Object> row = loadEventRow(eventId);

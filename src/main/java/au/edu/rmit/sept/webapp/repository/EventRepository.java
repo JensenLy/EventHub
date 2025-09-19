@@ -347,7 +347,7 @@ public class EventRepository {
     return list.isEmpty() ? null : list.get(0);
   }
 
-  public Event createEventWithAllExtraInfo(Event event, List<String> categoryNames) {
+  public Event createEventWithAllExtraInfo(Event event, List<Long> categoryIds) {
     final String sql = """
         INSERT INTO events (name, description, created_by_user_id, date_time, location, capacity, price,
                             detailed_description, agenda, speakers, dress_code)
@@ -378,17 +378,57 @@ public class EventRepository {
     }
 
     // Map category names -> ids and insert into join table
-    if (categoryNames != null && !categoryNames.isEmpty()) {
-        String placeholder = categoryNames.stream().map(n -> "?").collect(java.util.stream.Collectors.joining(", "));
-        String categoryIdSql = "SELECT category_id FROM categories WHERE name IN (" + placeholder + ")";
-        List<Long> categoryIds = jdbcTemplate.query(categoryIdSql, categoryNames.toArray(), (rs, i) -> rs.getLong(1));
-
-        String joinSql = "INSERT INTO event_categories(event_id, category_id) VALUES (?, ?)";
-        for (Long catId : categoryIds) {
-            jdbcTemplate.update(joinSql, event.getEventId(), catId);
-        }
-    }
+    if (categoryIds != null && !categoryIds.isEmpty()) {
+      String joinSql = "INSERT INTO event_categories(event_id, category_id) VALUES (?, ?)";
+      for (Long catId : categoryIds) {
+          jdbcTemplate.update(joinSql, event.getEventId(), catId);
+      }
+  }
     return event;
+}
+
+public int updateEventWithAllExtraInfo(Event event, List<Long> categoryIds) {
+  final String sql = """
+      UPDATE events
+         SET name = ?,
+             description = ?,
+             created_by_user_id = ?,
+             date_time = ?,
+             location = ?,
+             capacity = ?,
+             price = ?,
+             detailed_description = ?,
+             agenda = ?,
+             speakers = ?,
+             dress_code = ?
+       WHERE event_id = ?
+      """;
+
+  int rows = jdbcTemplate.update(sql,
+      event.getName(),
+      event.getDescription(),
+      event.getCreatedByUserId(),
+      event.getDateTime(),
+      event.getLocation(),
+      event.getCapacity(),
+      event.getPrice(),
+      event.getDetailedDescription(),
+      event.getAgenda(),
+      event.getSpeakers(),
+      event.getDressCode(),
+      event.getEventId()
+  );
+
+  // 🔄 update categories
+  jdbcTemplate.update("DELETE FROM event_categories WHERE event_id = ?", event.getEventId());
+
+  if (categoryIds != null && !categoryIds.isEmpty()) {
+      String joinSql = "INSERT INTO event_categories(event_id, category_id) VALUES (?, ?)";
+      for (Long catId : categoryIds) {
+          jdbcTemplate.update(joinSql, event.getEventId(), catId);
+      }
+  }
+  return rows;
 }
 }
 
