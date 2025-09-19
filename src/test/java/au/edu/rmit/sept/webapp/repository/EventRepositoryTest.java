@@ -7,6 +7,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 
 import javax.sql.DataSource;
 
@@ -60,8 +61,12 @@ class EventRepositoryTest {
     }
 
      // ---------- Helpers ----------
-  private Long categoryIdByName(String name) {
-    return jdbc.queryForObject("SELECT category_id FROM categories WHERE name = ?", Long.class, name);
+    private List<Long> categoryIdsForEvent(Long eventId) {
+      return jdbc.queryForList(
+          "SELECT category_id FROM event_categories WHERE event_id = ?", 
+          Long.class, 
+          eventId
+      );
   }
 
   private int countJoinRows(Long eventId) {
@@ -81,9 +86,9 @@ class EventRepositoryTest {
     return e;
   }
 
-  private Event fetchEvent(long id) {
-    return repo.findEventById(id);
-  }
+  private Map<String, Object> loadEventRow(long eventId) {
+    return jdbc.queryForMap("SELECT * FROM events WHERE event_id = ?", eventId);
+}
 
   @Test
   void findUpcomingEventsSorted_filtersPast_ordersAsc_andAggregatesCategories() {
@@ -170,4 +175,40 @@ class EventRepositoryTest {
       assertEquals(someEventId, e.getEventId());
       assertEquals(5L, e.getCreatedByUserId());
     }
+
+  @Test
+  void should_saveAndLoad_eventWithExtraInfo() {
+    String agenda = String.join("\n","17:30 - Registration","18:00 - Opening","19:00 - Key Takeaways");
+    Event e = new Event();
+    e.setName("AI Night");
+    e.setDesc("Evening event");
+    e.setCreatedByUserId(5L);
+    e.setDateTime(LocalDateTime.now().plusDays(2).withNano(0));
+    e.setLocation("Building 80");
+    e.setCapacity(100);
+    e.setPrice(new BigDecimal("0.00"));
+    e.setAgenda(agenda);
+    e.setSpeakers("Prof. X, Dr. Y");
+    e.setDressCode("Smart Casual");
+    List<String> categoryNames = List.of("Tech", "Career");
+
+    Event saved = repo.createEventWithAllExtraInfo(e, categoryNames);
+
+    assertNotNull(saved.getEventId());
+    assertTrue(saved.getEventId() > 0);
+
+    // Assert: fields persisted
+    Map<String, Object> row = loadEventRow(saved.getEventId());
+    assertEquals("AI Night", row.get("name"));
+    assertEquals("Short desc", row.get("description"));
+    assertEquals("B80 Theatre", row.get("location"));
+    assertEquals("Deep dive into AI topics.", row.get("detailed_description"));
+    assertEquals("6:00 PM – Check-in\n6:30 PM – Keynote\n7:00 PM – Panel\n8:00 PM – Networking", row.get("agenda"));
+    assertEquals("Prof. X, Dr. Y", row.get("speakers"));
+    assertEquals("Smart casual", row.get("dress_code"));
+
+    // Assert: categories joined
+    List<Long> joinIds = categoryIdsForEvent(saved.getEventId());
+    assertEquals(2, joinIds.size(), "Should have two category joins");
+  }
 }
