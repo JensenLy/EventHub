@@ -32,6 +32,20 @@ public class EventService {
     return eventRepo.createEventWithCategories(event, categoryIds);
   }
 
+  @Transactional
+  public Event createEventWithAllExtraInfo(Event event, List<Long>categoryIds) {
+    return eventRepo.createEventWithAllExtraInfo(event, categoryIds);
+  }
+
+  @Transactional
+  public Event updateEventWithAllExtraInfo(Event event, List<Long>categoryIds) {
+    int rows = eventRepo.updateEventWithAllExtraInfo(event, categoryIds);
+    if (rows == 0) {
+      throw new IllegalStateException("No event update for " + event.getEventId());
+    }
+    return event;
+  }
+
   public boolean eventExist(Long organiserId, String name, List<String> categoryNames, String location)
   {
     return eventRepo.checkEventExists(organiserId, name, categoryNames, location);
