@@ -24,6 +24,7 @@ import au.edu.rmit.sept.webapp.service.EventService;
 import au.edu.rmit.sept.webapp.service.RSVPService;
 
 
+
 @WebMvcTest(EventController.class)
 @AutoConfigureMockMvc
 public class createEventTest {
@@ -36,9 +37,10 @@ public class createEventTest {
     @MockBean
     private CategoryService categoryService;
 
-    private final String URL = "/eventForm";
+    @MockBean
+    private RSVPService rsvpService;
 
-    @MockBean RSVPService rsvpService;
+    private final String URL = "/eventForm";
 
     @Test
     void ShowSuccessfulEventCreation() throws Exception {
@@ -79,7 +81,7 @@ public class createEventTest {
             .param("categoryIds", "1", "2") 
         )
         .andExpect(status().is3xxRedirection())
-        .andExpect(redirectedUrl("/"))
+        .andExpect(redirectedUrl("/organiser/dashboard"))
         .andExpect(flash().attribute("successMessage", "Event created successfully!"));
     }
 

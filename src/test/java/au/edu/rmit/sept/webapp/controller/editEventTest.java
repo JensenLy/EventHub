@@ -6,14 +6,12 @@ import java.util.List;
 
 import static org.hamcrest.Matchers.containsString;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
-
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.when;
-import static org.mockito.ArgumentMatchers.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -37,10 +35,12 @@ public class editEventTest {
     @MockBean
     private EventService eventService;
 
-    @MockBean private RSVPService rsvpService;
 
     @MockBean
     private CategoryService categoryService;
+
+    @MockBean
+    private RSVPService rsvpService;
 
     private final String URL = "/event/edit/{id}";
 
@@ -85,7 +85,7 @@ public class editEventTest {
             .param("categoryIds", "1", "2") 
         )
         .andExpect(status().is3xxRedirection())
-        .andExpect(redirectedUrl("/"))
+        .andExpect(redirectedUrl("/organiser/dashboard"))
         .andExpect(flash().attribute("successMessage", "Event updated successfully!"));
     }
 

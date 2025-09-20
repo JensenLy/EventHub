@@ -1,13 +1,16 @@
 package au.edu.rmit.sept.webapp.repository;
 
 import java.sql.ResultSet;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 
-import au.edu.rmit.sept.webapp.model.RSVP;
+import au.edu.rmit.sept.webapp.model.*;
+
 
 @Repository
 public class RsvpRepository {
@@ -83,5 +86,42 @@ public class RsvpRepository {
             (rs, i) -> new AttendeeRow(rs.getString("name"), rs.getString("email"))
             );
     }
+
+    public List<Event> findEventsByUserId(Long userId) {
+        String sql = """
+            SELECT e.event_id, e.name, e.description, e.created_by_user_id,
+                e.date_time, e.location, e.capacity, e.price
+            FROM events e
+            JOIN rsvp r ON e.event_id = r.event_id
+            WHERE r.user_id = ?
+            ORDER BY e.date_time ASC
+        """;
+
+    List<Event> events = jdbcTemplate.query(sql, ps -> ps.setLong(1, userId), (rs, rowNum) -> new Event(
+            rs.getLong("event_id"),
+            rs.getString("name"),
+            rs.getString("description"),
+            rs.getObject("created_by_user_id") != null ? rs.getLong("created_by_user_id") : null,
+            rs.getTimestamp("date_time").toLocalDateTime(),
+            rs.getString("location"),
+            new ArrayList<>(), // we’ll fill categories next
+            rs.getObject("capacity") != null ? rs.getInt("capacity") : null,
+            rs.getBigDecimal("price")
+    ));
+
+        for(Event event : events){
+            String catSql = """
+                    SELECT c.name
+                    FROM categories c
+                    JOIN event_categories ec ON c.category_id = ec.category_id
+                    WHERE ec.event_id = ?
+                    """;
+
+            List<String> categories = jdbcTemplate.query(catSql, ps -> ps.setLong(1, event.getEventId()),
+            (rs, rowNum) -> rs.getString("name"));
+            event.setCategory(categories);
+    }
+            return events;
+        }
 }
 
