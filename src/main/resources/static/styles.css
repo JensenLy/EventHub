@@ -184,6 +184,7 @@ body {
   border: 1px solid transparent;
   text-decoration: none;
   cursor: pointer;
+  margin-top: 10px;
   box-shadow: var(--shadow);
 }
 .btn-dark,
@@ -739,4 +740,26 @@ body {
 }
 .card-actions .btn {
   margin-right: 8px;
+}
+
+
+.myRsvp {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+  width: 100%;
+}
+
+.myRsvp-card {
+  display: flex; 
+  width: 100%;
+  max-width: 400px; 
+  margin: 1 auto;
+  box-sizing: border-box; 
+}
+
+.myRsvp-title{
+  text-align: center;
+  padding: 20px;
 }

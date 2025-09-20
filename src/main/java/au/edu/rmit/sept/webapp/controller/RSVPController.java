@@ -1,6 +1,7 @@
 package au.edu.rmit.sept.webapp.controller;
 
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -60,6 +61,20 @@ public class RSVPController {
         }
     }
 
+    @PostMapping("/{userId}/rsvp/event/{eventId}/delete")
+    public String deleteFromMyRsvps(@PathVariable Long userId, @PathVariable Long eventId, RedirectAttributes redirectAttributes) {
+         try {
+            rsvpService.deleteRsvp(userId, eventId);
+            Event event = eventService.findById(eventId);
+            String successMsg = "You have successfully DELETED the RSVP to " + event.getName() + "!";
+            redirectAttributes.addFlashAttribute("successMessage", successMsg);
+            return "redirect:/rsvp/" + userId + "/my-rsvps";
+        } catch (IllegalArgumentException e) {
+            return "redirect:/rsvp/" + userId + "/my-rsvps";
+        }
+    }
+
+
     @GetMapping("/{userId}/event/{eventId}")
     public String rsvpConfirmPage(@PathVariable Long userId,
                                 @PathVariable Long eventId,
@@ -82,5 +97,13 @@ public class RSVPController {
 
         return "rsvpPage"; 
     }
+
+    @GetMapping("/{userId}/my-rsvps")
+        public String myRsvpsPage(@PathVariable Long userId, Model model) {
+        List<Event> events = rsvpService.getRsvpedEventsByUser(userId);
+        model.addAttribute("events", events);
+        model.addAttribute("userId", userId);
+        return "myRsvps"; 
+}
 }
 
