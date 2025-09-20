@@ -45,7 +45,7 @@ public class RSVPService {
       return rsvpRepository.findAttendeesByEvent(eventId);
     }
 
-    public List<Event> getRsvpedEventsByUser(Long userId){
-        return rsvpRepository.findEventsByUserId(userId);
+    public List<Event> getRsvpedEventsByUser(Long userId, String order){
+        return rsvpRepository.findEventsByUserId(userId, order);
     }
 }

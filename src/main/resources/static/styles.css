@@ -708,3 +708,25 @@ body {
   text-align: center;
   padding: 20px;
 }
+
+.select-sort{
+  display: flex;
+  justify-content: center;
+  text-align: center ;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.label-sort{
+  font-size: large;
+}
+
+.sort-selection, .sort-option-1, .sort-option-2{
+  background-color: #00cf0d;
+  border-radius: 30px;
+  padding: 5px;
+  color:white;
+}
+.sort-option-1{
+  border-radius: 30px;
+}

@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import au.edu.rmit.sept.webapp.model.Event;
@@ -99,10 +100,11 @@ public class RSVPController {
     }
 
     @GetMapping("/{userId}/my-rsvps")
-        public String myRsvpsPage(@PathVariable Long userId, Model model) {
-        List<Event> events = rsvpService.getRsvpedEventsByUser(userId);
+        public String myRsvpsPage(@PathVariable Long userId, @RequestParam(defaultValue = "ASC") String sortOrder, Model model) {
+        List<Event> events = rsvpService.getRsvpedEventsByUser(userId, sortOrder);
         model.addAttribute("events", events);
         model.addAttribute("userId", userId);
+        model.addAttribute("sortOrder", sortOrder);
         return "myRsvps"; 
 }
 }

@@ -87,15 +87,25 @@ public class RsvpRepository {
             );
     }
 
-    public List<Event> findEventsByUserId(Long userId) {
+    public List<Event> findEventsByUserId(Long userId, String sortOrder) {
+        String order = " ASC";
+        
+
+        if("DESC".equalsIgnoreCase(sortOrder)){
+            order = " DESC";
+        }
+
         String sql = """
             SELECT e.event_id, e.name, e.description, e.created_by_user_id,
                 e.date_time, e.location, e.capacity, e.price
             FROM events e
             JOIN rsvp r ON e.event_id = r.event_id
             WHERE r.user_id = ?
-            ORDER BY e.date_time ASC
-        """;
+            ORDER BY e.date_time 
+            """ + order;
+             System.out.println("Sort order: " + sortOrder);
+System.out.println("SQL: " + sql);
+
 
     List<Event> events = jdbcTemplate.query(sql, ps -> ps.setLong(1, userId), (rs, rowNum) -> new Event(
             rs.getLong("event_id"),
