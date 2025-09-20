@@ -87,7 +87,8 @@ public class rsvpUITest {
     @Test
     void Should_ShowMessage_WhenNoRSVP_MyRSVPpage() throws Exception {
         
-        when(rsvpService.getRsvpedEventsByUser(15L)).thenReturn(List.of());
+        // when(rsvpService.getRsvpedEventsByUser(15L)).thenReturn(List.of());
+        when(rsvpService.getRsvpedEventsByUser(15L, "ASC")).thenReturn(List.of());
 
         mvc.perform(get("/rsvp/15/my-rsvps").with(user("dummy15@example.com").roles("USER")))
           .andExpect(status().isOk())
@@ -99,7 +100,8 @@ public class rsvpUITest {
     @Test
     void Should_ShowRSVPedEvents_MyRSVPpage() throws Exception {
         
-        when(rsvpService.getRsvpedEventsByUser(15L)).thenReturn(List.of(
+        // when(rsvpService.getRsvpedEventsByUser(15L)).thenReturn(List.of(
+             when(rsvpService.getRsvpedEventsByUser(15L, "ASC")).thenReturn(List.of(
             ev(10, "Test", "Lab", fixedDateTime),
             ev(11, "DummyEvent", "NoWhere", fixedDateTime2),
             ev(11, "LmaoMeeting", "Circus", fixedDateTime3)
@@ -127,7 +129,9 @@ public class rsvpUITest {
     @Test
     void Should_ShowDeleteButton_WhenRSVPed_MyRSVPpage() throws Exception {
         
-        when(rsvpService.getRsvpedEventsByUser(15L)).thenReturn(List.of(
+        // when(rsvpService.getRsvpedEventsByUser(15L)).thenReturn(List.of(
+                    
+        when(rsvpService.getRsvpedEventsByUser(15L , "ASC")).thenReturn(List.of(
             ev(10, "Test", "Lab", fixedDateTime)
         ));
 

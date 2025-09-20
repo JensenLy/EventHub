@@ -453,8 +453,10 @@ public class rsvpIntegrationTest {
 
         List<Event> rsvpedEvents = List.of(event1, event2);
         
-        when(rsvpService.getRsvpedEventsByUser(2L)).thenReturn(rsvpedEvents);
+        // when(rsvpService.getRsvpedEventsByUser(2L)).thenReturn(rsvpedEvents);
 
+        //change the test case that fit the new method  getRsvpedEventsByUser that take 2 parameters extra order
+        when(rsvpService.getRsvpedEventsByUser(2L, "ASC")).thenReturn(rsvpedEvents);
         mvc.perform(get("/rsvp/2/my-rsvps")
                 .with(user("dummy2@example.com").roles("USER")))
             .andExpect(status().isOk())
@@ -462,6 +464,8 @@ public class rsvpIntegrationTest {
             .andExpect(model().attribute("events", rsvpedEvents))
             .andExpect(model().attribute("userId", 2L));
         
-        verify(rsvpService).getRsvpedEventsByUser(2L);
+        // verify(rsvpService).getRsvpedEventsByUser(2L);
+        verify(rsvpService).getRsvpedEventsByUser(2L, "ASC");
+
     }
 }
