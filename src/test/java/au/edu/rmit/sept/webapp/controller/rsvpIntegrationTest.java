@@ -150,4 +150,72 @@ public class rsvpIntegrationTest {
         verify(rsvpService).submitRSVP(1L, 5L);
         verify(eventService).findById(5L);
     }
+
+    @Test
+    void Should_ShowMessage_When_ClickDelete_MainPage() throws Exception {
+        // Mock Category
+        List<EventCategory> categories = List.of(
+            new EventCategory(1L, "Social"),
+            new EventCategory(2L, "Career")
+        );
+        List<String> categoryNames = categories.stream().map(EventCategory::getName).toList();
+
+        // Mock Date
+        LocalDateTime fixedDateTime = LocalDateTime.of(2025, 9, 22, 12, 0);
+
+        // Mock Event
+        Event event = new Event(
+            5L,
+            "Test", 
+            "Test", 
+            2L,
+            fixedDateTime,
+            "Lab", 
+            categoryNames, 
+            743753, 
+            new BigDecimal("324234")
+        );
+        when(eventService.findById(5L)).thenReturn(event);
+
+        when(rsvpService.deleteRsvp(1L, 5L)).thenReturn(true);
+
+        mvc.perform(post("/rsvp/1/event/5/delete"))
+        .andExpect(status().is3xxRedirection())
+        .andExpect(redirectedUrl("/"))
+        .andExpect(flash().attribute("successMessage", "You have successfully DELETED the RSVP to Test!")); 
+    }
+
+    @Test
+    void Should_ShowMessage_When_ClickDelete_MyRSVPPage() throws Exception {
+        // Mock Category
+        List<EventCategory> categories = List.of(
+            new EventCategory(1L, "Social"),
+            new EventCategory(2L, "Career")
+        );
+        List<String> categoryNames = categories.stream().map(EventCategory::getName).toList();
+
+        // Mock Date
+        LocalDateTime fixedDateTime = LocalDateTime.of(2025, 9, 22, 12, 0);
+
+        // Mock Event
+        Event event = new Event(
+            5L,
+            "Bla bla bla", 
+            "Test", 
+            2L,
+            fixedDateTime,
+            "Lab", 
+            categoryNames, 
+            743753, 
+            new BigDecimal("324234")
+        );
+        when(eventService.findById(5L)).thenReturn(event);
+
+        when(rsvpService.deleteRsvp(1L, 5L)).thenReturn(true);
+
+        mvc.perform(post("/rsvp/1/rsvp/event/5/delete"))
+        .andExpect(status().is3xxRedirection())
+        .andExpect(redirectedUrl("/rsvp/1/my-rsvps"))
+        .andExpect(flash().attribute("successMessage", "You have successfully DELETED the RSVP to Bla bla bla!")); 
+    }
 }
