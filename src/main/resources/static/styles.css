@@ -873,3 +873,15 @@ body {
 .sort-option-1{
   border-radius: 30px;
 }
+.nav-button{
+  background-color: #00cf0d;
+  border-radius: 30px;
+  padding: 5px;
+  color:white;
+  text-decoration: none;
+}
+.nav-button:hover{
+  background-color: #00a60b;
+  text-decoration: none;
+  color: white;
+}
