@@ -97,18 +97,6 @@ public class SecurityConfig {
             .roles("ORGANISER")
             .build();
 
-        UserDetails organiser2 = User.builder()
-            .username("dummy6@example.com")
-            .password(passwordEncoder().encode("password123"))
-            .roles("ORGANISER")
-            .build();
-
-            UserDetails admin = User.builder()
-            .username("dummy7@example.com")
-            .password(passwordEncoder().encode("password123"))
-            .roles("ADMIN")
-            .build();
-
-        return new InMemoryUserDetailsManager(user, user2 , user3, user4 ,organiser, organiser2 ,  admin);
+        return new InMemoryUserDetailsManager(user, user2 , user3, user4 ,organiser);
     }
 }
