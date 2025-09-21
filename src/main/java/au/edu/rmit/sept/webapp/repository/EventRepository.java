@@ -36,13 +36,31 @@ public class EventRepository {
     new ArrayList<>(),
     rs.getObject("capacity") != null ? rs.getInt("capacity") : null,
     rs.getBigDecimal("price")
-);
+  );
+
+  private static final RowMapper<Event> FULL_MAPPER = (rs, rowNum) -> {
+    Event ev = new Event(
+        rs.getLong("event_id"),
+        rs.getString("name"),
+        rs.getString("description"),
+        rs.getObject("created_by_user_id") != null ? rs.getLong("created_by_user_id") : null,
+        rs.getTimestamp("date_time").toLocalDateTime(),
+        rs.getString("location"),
+        new ArrayList<>(),
+        rs.getObject("capacity") != null ? rs.getInt("capacity") : null,
+        rs.getBigDecimal("price")
+    );
+    ev.setDetailedDescription(rs.getString("detailed_description"));
+    ev.setAgenda(rs.getString("agenda"));
+    ev.setSpeakers(rs.getString("speakers"));
+    ev.setDressCode(rs.getString("dress_code"));
+    return ev;
+  };
 
 
   public List<Event> findUpcomingEventsSorted () {
     String sql = """
-        SELECT  e.event_id, e.name, e.description, e.created_by_user_id,
-                e.date_time, e.location, e.capacity, e.price, c.name as category_name
+        SELECT  e.*, c.name as category_name
         FROM events e
         LEFT JOIN event_categories ec ON e.event_id = ec.event_id
         LEFT JOIN categories c ON ec.category_id = c.category_id
@@ -69,6 +87,10 @@ public class EventRepository {
                       rs.getObject("capacity") != null ? rs.getInt("capacity") : null,
                       rs.getBigDecimal("price")
                   );
+                  ev.setDetailedDescription(rs.getString("detailed_description"));
+                  ev.setAgenda(rs.getString("agenda"));
+                  ev.setSpeakers(rs.getString("speakers"));
+                  ev.setDressCode(rs.getString("dress_code"));
                   events.put(eventId, ev);
               }
 
@@ -126,10 +148,6 @@ public class EventRepository {
         jdbcTemplate.update(joinSql, event.getEventId(), catId);
     }   
   }
-  System.out.println("[DEBUG] Saved eventId=" + event.getEventId() 
-                   + " name=" + event.getName() 
-                   + " (no explicit categoryIds)");
-
     return event;
   }
 
@@ -208,8 +226,13 @@ public class EventRepository {
 }
   public Event findEventById(Long eventId)
   {
-    String sql = "SELECT * FROM events WHERE event_id = ?";
-    return jdbcTemplate.queryForObject(sql, MAPPER, eventId);
+    String sql = """
+        SELECT event_id, name, description, created_by_user_id, date_time, location,
+               capacity, price, detailed_description, agenda, speakers, dress_code
+        FROM events
+        WHERE event_id = ?
+        """;;
+    return jdbcTemplate.queryForObject(sql, FULL_MAPPER, eventId);
   }
 
   public int updateEvent(Event event, List<Long> categoryIds)
@@ -288,9 +311,7 @@ public class EventRepository {
   // get upcoming events created by a given organiser
   public List<Event> findEventsByOrganiser(Long organiserId) {
     String sql = """
-        SELECT e.event_id, e.name, e.description, e.created_by_user_id,
-               e.date_time, e.location, e.capacity, e.price,
-               c.name AS category_name
+        SELECT e.*, c.name AS category_name
         FROM events e
         LEFT JOIN event_categories ec ON e.event_id = ec.event_id
         LEFT JOIN categories c ON ec.category_id = c.category_id
@@ -316,6 +337,10 @@ public class EventRepository {
                       rs.getObject("capacity") != null ? rs.getInt("capacity") : null,
                       rs.getBigDecimal("price")
                   );
+                  event.setDetailedDescription(rs.getString("detailed_description"));
+                  event.setAgenda(rs.getString("agenda"));
+                  event.setSpeakers(rs.getString("speakers"));
+                  event.setDressCode(rs.getString("dress_code"));
                   map.put(id, event);
               }
               String cat = rs.getString("category_name");
@@ -346,6 +371,90 @@ public class EventRepository {
     ));
     return list.isEmpty() ? null : list.get(0);
   }
+
+  public Event createEventWithAllExtraInfo(Event event, List<Long> categoryIds) {
+    final String sql = """
+        INSERT INTO events (name, description, created_by_user_id, date_time, location, capacity, price,
+                            detailed_description, agenda, speakers, dress_code)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """;
+
+    KeyHolder keyHolder = new GeneratedKeyHolder();
+
+    jdbcTemplate.update(con -> {
+        var ps = con.prepareStatement(sql, new String[]{"event_id"});
+        ps.setString(1, event.getName());
+        ps.setString(2, event.getDescription());
+        ps.setObject(3, event.getCreatedByUserId()); // nullable
+        ps.setObject(4, event.getDateTime());
+        ps.setString(5, event.getLocation());
+        ps.setObject(6, event.getCapacity());
+        ps.setBigDecimal(7, event.getPrice());
+        ps.setString(8, event.getDetailedDescription());
+        ps.setString(9, event.getAgenda());
+        ps.setString(10, event.getSpeakers());
+        ps.setString(11, event.getDressCode());
+        return ps;
+    }, keyHolder);
+
+    Number key = keyHolder.getKey();
+    if (key != null) {
+        event.setEventId(key.longValue());
+    }
+
+    // Map category names -> ids and insert into join table
+    if (categoryIds != null && !categoryIds.isEmpty()) {
+      String joinSql = "INSERT INTO event_categories(event_id, category_id) VALUES (?, ?)";
+      for (Long catId : categoryIds) {
+          jdbcTemplate.update(joinSql, event.getEventId(), catId);
+      }
+  }
+    return event;
+}
+
+public int updateEventWithAllExtraInfo(Event event, List<Long> categoryIds) {
+  final String sql = """
+      UPDATE events
+         SET name = ?,
+             description = ?,
+             created_by_user_id = ?,
+             date_time = ?,
+             location = ?,
+             capacity = ?,
+             price = ?,
+             detailed_description = ?,
+             agenda = ?,
+             speakers = ?,
+             dress_code = ?
+       WHERE event_id = ?
+      """;
+
+  int rows = jdbcTemplate.update(sql,
+      event.getName(),
+      event.getDescription(),
+      event.getCreatedByUserId(),
+      event.getDateTime(),
+      event.getLocation(),
+      event.getCapacity(),
+      event.getPrice(),
+      event.getDetailedDescription(),
+      event.getAgenda(),
+      event.getSpeakers(),
+      event.getDressCode(),
+      event.getEventId()
+  );
+
+  // 🔄 update categories
+  jdbcTemplate.update("DELETE FROM event_categories WHERE event_id = ?", event.getEventId());
+
+  if (categoryIds != null && !categoryIds.isEmpty()) {
+      String joinSql = "INSERT INTO event_categories(event_id, category_id) VALUES (?, ?)";
+      for (Long catId : categoryIds) {
+          jdbcTemplate.update(joinSql, event.getEventId(), catId);
+      }
+  }
+  return rows;
+}
 }
 
 

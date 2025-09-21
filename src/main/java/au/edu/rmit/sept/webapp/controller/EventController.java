@@ -130,7 +130,7 @@ public class EventController {
           return "eventPage";
       }
 
-      eventService.saveEventWithCategories(event, categoryIds);
+      eventService.createEventWithAllExtraInfo(event, categoryIds);
       redirectAttributes.addFlashAttribute("successMessage", "Event created successfully!");
       return "redirect:/organiser/dashboard";
   }
@@ -173,8 +173,7 @@ public class EventController {
         event.setEventId(eventId);
         long currentUserId = currentUserService.getCurrentUserId();
         event.setCreatedByUserId(currentUserId);
-        // event.setCreatedByUserId(5L); //remove the hardcoded userId
-        eventService.updateEvent(event, categoryIds);
+        eventService.updateEventWithAllExtraInfo(event, categoryIds);
         redirectAttributes.addFlashAttribute("successMessage", "Event updated successfully!");
         return "redirect:/organiser/dashboard";
     }
@@ -201,6 +200,16 @@ public class EventController {
     {
       eventService.filterEventsByCategory(categoryId);
       return "index";
+    }
+
+    @GetMapping("/events/{id}")
+    public String viewEvent(@PathVariable Long id, Model model) {
+        Event event = eventService.findById(id);
+        if (event == null) {
+            return "redirect:/";
+        }
+        model.addAttribute("event", event);
+        return "eventDetail";
     }
 
 }

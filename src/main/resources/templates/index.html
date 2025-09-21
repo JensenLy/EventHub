@@ -106,6 +106,20 @@
               </div>
             </div>
           </div>  
+          <!-- View Details button -->
+          <button
+          type="button"
+          class="btn btn-dark"
+          th:attr="data-event-id=${event.eventId}"
+          onclick="openEventModal(this)"
+          >
+          View Details
+          </button>
+
+          <!-- Hidden modal template for THIS event -->
+          <template th:id="'event-template-' + ${event.eventId}">
+          <th:block th:replace="~{components/eventDetail :: eventDetails(event=${event})}"></th:block>
+          </template>
 
           <!-- RSVP Buttons -->
               <form th:action="@{'/rsvp/' + ${currentUserId} + '/event/' + ${event.eventId}}" method="get" class="rsvp-form">
@@ -128,7 +142,6 @@
                   >Cancel this RSVP</button>
                 </form>
               </div>
-
         </article>
       </div>
       </div>
@@ -148,6 +161,28 @@
           <div class="stat-sub">Customer satisfaction</div>
         </div>
       </div>
+      <div id="eventModal" class="modal">
+        <div class="modal-content">
+          <span class="close" onclick="closeEventModal()">&times;</span>
+          <div id="modal-body"></div>
+        </div>
+      </div>
+      <script>
+        function openEventModal(button) {
+          const eventId = button.getAttribute("data-event-id");
+          const template = document.getElementById("event-template-" + eventId);
+          if (!template) return;
+          document.getElementById("modal-body").innerHTML = template.innerHTML;
+          document.getElementById("eventModal").style.display = "block";
+        }
+        function closeEventModal() {
+          document.getElementById("eventModal").style.display = "none";
+        }
+        window.onclick = function (event) {
+          const modal = document.getElementById("eventModal");
+          if (event.target === modal) closeEventModal();
+        };
+      </script>
     </section>
   </body>
 </html>
