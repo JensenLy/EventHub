@@ -32,6 +32,10 @@ class EventControllerFullInfoTest {
     @MockBean
     private EventService eventService;
 
+    /**
+     * Tests that /events/{id} renders full event info
+     * (description, agenda, speakers, dress code).
+     */
     @Test
     void eventDetail_showsFullInfo() throws Exception {
         Event e = new Event();
