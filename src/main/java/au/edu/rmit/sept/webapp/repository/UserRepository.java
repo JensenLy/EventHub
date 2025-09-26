@@ -3,6 +3,7 @@ package au.edu.rmit.sept.webapp.repository;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -75,5 +76,55 @@ public class UserRepository {
             return null; // Return null if no user found with this email
         }
     }
+    
+    // Finds a user by id and returns core fields, returns null if not found
+    public User findUserbyId(Long userId) {
+      String sql = "SELECT user_id, name, email, password, role, status FROM users WHERE user_id = ?";
+      try {
+        return jdbcTemplate.queryForObject(sql, MAPPER, userId);
+      } catch (EmptyResultDataAccessException e) {
+        return null;
+      }
+    }
+
+    /**
+     * Returns a map view of the user profile including the new profile columns:
+     *  user_id, name, email, display_name, avatar_url, bio, gender, updated_at
+     * Throws EmptyResultDataAccessException if user not found.
+     */
+    public Map<String, Object> findUserProfileMapById(Long userId) {
+        return jdbcTemplate.queryForMap("""
+            SELECT user_id, name, email, display_name, avatar_url, bio, gender, updated_at
+            FROM users
+            WHERE user_id = ?
+            """, userId);
+    }
+
+    /**
+     * Updates user profile fields: display_name, avatar_url, bio, gender.
+     * Sets updated_at = CURRENT_TIMESTAMP.
+     * Returns number of rows affected (0 if user_id not found).
+     */
+    public int updateProfile(Long userId,
+                            String displayName,
+                            String avatarUrl,  
+                            String bio,        
+                            String gender) {
+        return jdbcTemplate.update("""
+            UPDATE users
+              SET display_name = ?,
+                  avatar_url   = ?,
+                  bio          = ?,
+                  gender       = ?,
+                  updated_at   = CURRENT_TIMESTAMP
+            WHERE user_id = ?
+            """,
+            displayName,
+            avatarUrl,    
+            bio,          
+            gender,  
+            userId
+        );
+  }
 }
 
