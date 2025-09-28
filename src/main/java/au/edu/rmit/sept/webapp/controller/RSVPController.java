@@ -16,19 +16,38 @@ import au.edu.rmit.sept.webapp.model.Event;
 import au.edu.rmit.sept.webapp.service.EventService;
 import au.edu.rmit.sept.webapp.service.RSVPService;
 import au.edu.rmit.sept.webapp.service.UserService;
+import au.edu.rmit.sept.webapp.service.CurrentUserService;
 
 @Controller
 @RequestMapping("/rsvp")
 public class RSVPController {
 
+    private final CurrentUserService currentUserService;
     private final RSVPService rsvpService;
     private final UserService userService;
     private final EventService eventService;
 
-    public RSVPController(RSVPService rsvpService, EventService eventService, UserService userService) {
+    public RSVPController(RSVPService rsvpService, EventService eventService, UserService userService, CurrentUserService currentUserService) {
         this.rsvpService = rsvpService;
         this.eventService = eventService;
         this.userService = userService;
+        this.currentUserService = currentUserService;
+    }
+
+    //Helpers
+    private Long currentUserId() {
+    return currentUserService.getCurrentUserId();
+    }
+
+    private boolean isSelf(Long pathUserId) {
+        Long current = currentUserId();
+        return current != null && current.equals(pathUserId);
+    }
+
+    private String sanitizeSortOrder(String raw) {
+        if (raw == null) return "ASC";
+        String s = raw.trim().toUpperCase();
+        return ("DESC".equals(s)) ? "DESC" : "ASC";
     }
 
     // submit the rsvp, will redirect to mainpage regardless, but will have different messages depend on if it fails or successes 
@@ -111,14 +130,24 @@ public class RSVPController {
         public String myRsvpsPage(@PathVariable Long userId, 
                                   @RequestParam(defaultValue = "ASC") String sortOrder,
                                   @RequestParam(name = "tab", defaultValue = "rsvps") String tab,
-                                  Model model) {
+                                  Model model,
+                                  RedirectAttributes ra) {
+        
+        /*Guard against user id injection */
+        if (!isSelf(userId)) {
+          ra.addFlashAttribute("errorMessage", "Unauthorised access for this page.");
+          return "redirect:/rsvp/" + currentUserId() + "/my-rsvps?tab=rsvps";
+        }
+
+        String order = sanitizeSortOrder(sortOrder);
         List<Event> events = rsvpService.getRsvpedEventsByUser(userId, sortOrder); //get the list of rsvped events by userId
         var profile = userService.findUserProfileMapById(userId);
+
         model.addAttribute("events", events);
         model.addAttribute("userProfile", profile);
         model.addAttribute("userId", userId);
         model.addAttribute("sortOrder", sortOrder);
-        model.addAttribute("currentUserId", userId); 
+        model.addAttribute("currentUserId", currentUserId()); 
         model.addAttribute("activeTab", "profile".equalsIgnoreCase(tab) ? "profile" : "rsvps");
         return "myRsvps"; 
     }
