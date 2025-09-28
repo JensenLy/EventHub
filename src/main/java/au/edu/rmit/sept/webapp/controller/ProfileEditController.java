@@ -28,16 +28,16 @@ public class ProfileEditController {
   }
 
   /* Helpers */
-  private void populateModel(Model model) {
-    Long userId = currentUserService.getCurrentUserId();
-    Map<String, Object> user = userService.findUserProfileMapById(userId); // expects keys: user_id, name, email, display_name, avatar_url, bio, gender, updated_at
-    model.addAttribute("user", user);
-    model.addAttribute("genders", allowedGenders);
-  }
+  // private void populateModel(Model model) {
+  //   Long userId = currentUserService.getCurrentUserId();
+  //   Map<String, Object> user = userService.findUserProfileMapById(userId); // expects keys: user_id, name, email, display_name, avatar_url, bio, gender, updated_at
+  //   model.addAttribute("user", user);
+  //   model.addAttribute("genders", allowedGenders);
+  // }
 
-  private static String emptyToNull(String s) {
-    return (StringUtils.hasText(s) ? s : null);
-  }
+  // private static String emptyToNull(String s) {
+  //   return (StringUtils.hasText(s) ? s : null);
+  // }
 
   private static String normalizeGender(String raw) {
     if (!StringUtils.hasText(raw)) return "prefer_not_to_say";
@@ -54,5 +54,29 @@ public class ProfileEditController {
     return g;
   }
 
+  @PostMapping("/profile/edit")
+  public String update(String displayName,
+                        String avatarUrl,
+                        String bio,
+                        String gender,
+                        RedirectAttributes ra) {
   
+  Long userId = currentUserService.getCurrentUserId();
+
+  try {
+    String dn = StringUtils.trimAllWhitespace(displayName);
+    String au = StringUtils.hasText(avatarUrl) ? StringUtils.trimAllWhitespace(avatarUrl) : null;
+    String b = StringUtils.hasText(bio) ? StringUtils.trimAllWhitespace(bio) : null;
+    String g = normalizeGender(StringUtils.trimAllWhitespace(gender));
+
+    if (!allowedGenders.contains(g)) {
+      throw new IllegalArgumentException("Invalid gender: " + gender);
+    }
+    userService.updateProfile(userId, dn, au, b, g);
+    ra.addFlashAttribute("successMessage", "Profile updated successfully.");
+  } catch (IllegalArgumentException e) {
+    ra.addFlashAttribute("errorMessage", e.getMessage());
+  }
+  return "redirect:/rsvp" + userId + "/my-rsvps?tab=profile";
+  }
 }

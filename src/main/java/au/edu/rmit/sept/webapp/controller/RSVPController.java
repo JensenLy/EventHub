@@ -140,15 +140,16 @@ public class RSVPController {
         }
 
         String order = sanitizeSortOrder(sortOrder);
-        List<Event> events = rsvpService.getRsvpedEventsByUser(userId, sortOrder); //get the list of rsvped events by userId
+        List<Event> events = rsvpService.getRsvpedEventsByUser(userId, order); //get the list of rsvped events by userId
         var profile = userService.findUserProfileMapById(userId);
 
         model.addAttribute("events", events);
         model.addAttribute("userProfile", profile);
         model.addAttribute("userId", userId);
-        model.addAttribute("sortOrder", sortOrder);
+        model.addAttribute("sortOrder", order);
         model.addAttribute("currentUserId", currentUserId()); 
         model.addAttribute("activeTab", "profile".equalsIgnoreCase(tab) ? "profile" : "rsvps");
+        model.addAttribute("genders", List.of("male","female","nonbinary","other","prefer_not_to_say"));
         return "myRsvps"; 
     }
 }
