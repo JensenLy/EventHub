@@ -6,6 +6,8 @@ import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
+
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,9 +37,11 @@ import au.edu.rmit.sept.webapp.service.UserService;
 import au.edu.rmit.sept.webapp.model.Event;
 import au.edu.rmit.sept.webapp.service.EventService;
 import au.edu.rmit.sept.webapp.service.RSVPService;
+import au.edu.rmit.sept.webapp.service.CurrentUserService;
+
 
 @SpringBootTest
-@AutoConfigureMockMvc
+@AutoConfigureMockMvc (addFilters = false)
 public class rsvpIntegrationTest {
     
     @Autowired
@@ -52,16 +56,19 @@ public class rsvpIntegrationTest {
     @MockBean 
     private RSVPService rsvpService;
 
+    @MockBean
+    private CurrentUserService currentUserService;
+
     @Autowired
     private WebApplicationContext context;
 
-    @BeforeEach
-    void setUp() {
-        mvc = MockMvcBuilders
-                .webAppContextSetup(context)
-                .apply(springSecurity())
-                .build();
-    }
+    // @BeforeEach
+    // void setUp() {
+    //     mvc = MockMvcBuilders
+    //             .webAppContextSetup(context)
+    //             .apply(springSecurity())
+    //             .build();
+    // }
 
     @Test
     void Should_ShowForm_When_ClickRsvpButton() throws Exception {
@@ -80,6 +87,7 @@ public class rsvpIntegrationTest {
         event.setPrice(new BigDecimal("324234"));
         
         when(eventService.findById(5L)).thenReturn(event);
+        when(currentUserService.getCurrentUserId()).thenReturn(2L);
 
         mvc.perform(get("/rsvp/2/event/5")
                 .with(user("dummy2@example.com").roles("USER")))
@@ -111,7 +119,7 @@ public class rsvpIntegrationTest {
 
         when(eventService.findById(3L)).thenReturn(event);
         when(rsvpService.submitRSVP(2L, 3L)).thenReturn(true);
-
+        when(currentUserService.getCurrentUserId()).thenReturn(2L);
         mvc.perform(post("/rsvp/2/event/3/confirm")
                 .with(user("dummy2@example.com").roles("USER"))
                 .with(csrf()))
@@ -138,7 +146,7 @@ public class rsvpIntegrationTest {
         event.setLocation("Backroom");
         event.setCapacity(743753);
         event.setPrice(new BigDecimal("324234"));
-
+        when(currentUserService.getCurrentUserId()).thenReturn(2L);
         when(eventService.findById(5L)).thenReturn(event);
         when(rsvpService.submitRSVP(1L, 5L)).thenReturn(false); // false indicates duplicate
 
@@ -171,9 +179,9 @@ public class rsvpIntegrationTest {
 
         when(eventService.findById(5L)).thenReturn(event);
         // deleteRsvp likely returns void, not boolean
-       when(rsvpService.deleteRsvp(2L, 5L)).thenReturn(true);
+       when(rsvpService.deleteRsvp(1L, 5L)).thenReturn(true);
 
-
+        when(currentUserService.getCurrentUserId()).thenReturn(1L);
        //dummy@example.com => userId is 1L so rsvp/1
         mvc.perform(post("/rsvp/1/event/5/delete")
                 .with(user("dummy@example.com").roles("USER"))
@@ -205,7 +213,7 @@ public class rsvpIntegrationTest {
         when(eventService.findById(5L)).thenReturn(event);
      
       when(rsvpService.deleteRsvp(1L, 5L)).thenReturn(true);
-
+        when(currentUserService.getCurrentUserId()).thenReturn(1L);
         mvc.perform(post("/rsvp/1/rsvp/event/5/delete")
                 .with(user("dummy@example.com").roles("USER"))
                 .with(csrf()))
@@ -235,7 +243,7 @@ public class rsvpIntegrationTest {
         List<Event> rsvpedEvents = List.of(event1, event2);
         
         // when(rsvpService.getRsvpedEventsByUser(2L)).thenReturn(rsvpedEvents);
-
+        when(currentUserService.getCurrentUserId()).thenReturn(2L);
         //change the test case that fit the new method  getRsvpedEventsByUser that take 2 parameters extra order
         when(rsvpService.getRsvpedEventsByUser(2L, "ASC")).thenReturn(rsvpedEvents);
         mvc.perform(get("/rsvp/2/my-rsvps")
@@ -260,7 +268,7 @@ void Should_RenderProfileTab_WithUserProfile() throws Exception {
 
     // No RSVPs needed for this assertion path
     when(rsvpService.getRsvpedEventsByUser(2L, "ASC")).thenReturn(List.of());
-
+    when(currentUserService.getCurrentUserId()).thenReturn(2L);
     mvc.perform(get("/rsvp/2/my-rsvps")
             .param("tab", "profile")
             .param("sortOrder", "ASC")
@@ -280,7 +288,7 @@ void Should_RenderProfileTab_WithUserProfile() throws Exception {
 void Should_DefaultToRsvpsTab_When_TabParamMissing() throws Exception {
     when(rsvpService.getRsvpedEventsByUser(2L, "ASC")).thenReturn(List.of());
     when(userService.findUserProfileMapById(2L)).thenReturn(new HashMap<>());
-
+    when(currentUserService.getCurrentUserId()).thenReturn(2L);
     mvc.perform(get("/rsvp/2/my-rsvps")
             .with(user("dummy2@example.com").roles("USER")))
        .andExpect(status().isOk())
@@ -295,7 +303,7 @@ void Should_DefaultToRsvpsTab_When_TabParamMissing() throws Exception {
 void Should_RequestDescendingSort_When_SortOrderDESC() throws Exception {
     when(rsvpService.getRsvpedEventsByUser(2L, "DESC")).thenReturn(List.of());
     when(userService.findUserProfileMapById(2L)).thenReturn(new HashMap<>());
-
+    when(currentUserService.getCurrentUserId()).thenReturn(2L);
     mvc.perform(get("/rsvp/2/my-rsvps")
             .param("sortOrder", "DESC")
             .with(user("dummy2@example.com").roles("USER")))

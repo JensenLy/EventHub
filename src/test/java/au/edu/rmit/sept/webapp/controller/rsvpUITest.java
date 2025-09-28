@@ -1,6 +1,7 @@
 package au.edu.rmit.sept.webapp.controller;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
 
 import static org.hamcrest.Matchers.containsString;
@@ -14,6 +15,7 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import org.springframework.test.web.servlet.MockMvc;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.flash;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
@@ -22,16 +24,18 @@ import au.edu.rmit.sept.webapp.repository.RsvpRepository;
 import au.edu.rmit.sept.webapp.service.CurrentUserService;
 import au.edu.rmit.sept.webapp.service.EventService;
 import au.edu.rmit.sept.webapp.service.RSVPService;
+import au.edu.rmit.sept.webapp.service.UserService;
 
 @SpringBootTest
-@AutoConfigureMockMvc
+@AutoConfigureMockMvc (addFilters = false)
 public class rsvpUITest {
     @Autowired MockMvc mvc;
 
     @MockBean EventService eventService;
     @MockBean RsvpRepository rsvpRepository;
-    @MockBean CurrentUserService userService; 
+    @MockBean CurrentUserService currentUserService; 
     @MockBean RSVPService rsvpService;
+    @MockBean UserService userService;
 
 
     LocalDateTime fixedDateTime = LocalDateTime.of(2026, 9, 22, 12, 0);
@@ -54,7 +58,7 @@ public class rsvpUITest {
             ev(10, "Test", "Lab", fixedDateTime),
             ev(11, "DummyEvent", "NoWhere", fixedDateTime)
         ));
-        when(userService.getCurrentUserId()).thenReturn(15L);
+        when(currentUserService.getCurrentUserId()).thenReturn(15L);
 
         mvc.perform(get("/"))
           .andExpect(status().isOk())
@@ -72,7 +76,7 @@ public class rsvpUITest {
             ev(11, "DummyEvent", "NoWhere", fixedDateTime)
         ));
         when(rsvpRepository.checkUserAlreadyRsvped(15L, 10L)).thenReturn(true);
-        when(userService.getCurrentUserId()).thenReturn(15L);
+        when(currentUserService.getCurrentUserId()).thenReturn(15L);
 
         mvc.perform(get("/"))
           .andExpect(status().isOk())
@@ -89,7 +93,8 @@ public class rsvpUITest {
         
         // when(rsvpService.getRsvpedEventsByUser(15L)).thenReturn(List.of());
         when(rsvpService.getRsvpedEventsByUser(15L, "ASC")).thenReturn(List.of());
-
+        when(currentUserService.getCurrentUserId()).thenReturn(15L);
+        when(userService.findUserProfileMapById(15L)).thenReturn(new HashMap<>());
         mvc.perform(get("/rsvp/15/my-rsvps").with(user("dummy15@example.com").roles("USER")))
           .andExpect(status().isOk())
           .andExpect(view().name("myRsvps"))
@@ -106,7 +111,8 @@ public class rsvpUITest {
             ev(11, "DummyEvent", "NoWhere", fixedDateTime2),
             ev(11, "LmaoMeeting", "Circus", fixedDateTime3)
         ));
-
+        when(currentUserService.getCurrentUserId()).thenReturn(15L);
+        when(userService.findUserProfileMapById(15L)).thenReturn(new HashMap<>());
         mvc.perform(get("/rsvp/15/my-rsvps").with(user("dummy15@example.com").roles("USER")))
           .andExpect(status().isOk())
           .andExpect(view().name("myRsvps"))
@@ -131,6 +137,8 @@ public class rsvpUITest {
         
         // when(rsvpService.getRsvpedEventsByUser(15L)).thenReturn(List.of(
                     
+        when(currentUserService.getCurrentUserId()).thenReturn(15L);
+        when(userService.findUserProfileMapById(15L)).thenReturn(new HashMap<>());
         when(rsvpService.getRsvpedEventsByUser(15L , "ASC")).thenReturn(List.of(
             ev(10, "Test", "Lab", fixedDateTime)
         ));
