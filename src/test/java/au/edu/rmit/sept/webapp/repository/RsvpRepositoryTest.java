@@ -17,20 +17,22 @@
     import org.springframework.boot.test.context.SpringBootTest;
     import org.springframework.jdbc.core.JdbcTemplate;
     import org.springframework.test.context.TestPropertySource;
+import org.springframework.transaction.annotation.Transactional;
 
-    import au.edu.rmit.sept.webapp.model.Event;
+import au.edu.rmit.sept.webapp.model.Event;
     import au.edu.rmit.sept.webapp.model.RSVP;
 
 
     @SpringBootTest
     @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+    @Transactional
     @TestPropertySource(properties = {
-        "spring.datasource.url=jdbc:mysql://localhost:3306/ProcessToolsDB",
-        "spring.datasource.username=admin",
-        "spring.datasource.password=password123",
-        "spring.jpa.hibernate.ddl-auto=none",
-        "spring.sql.init.mode=never"
-    })
+    "spring.datasource.url=jdbc:mysql://localhost:3307/ProcessToolsDB_Test",
+    "spring.datasource.username=admin",
+    "spring.datasource.password=password123",
+    "spring.jpa.hibernate.ddl-auto=none",
+    "spring.sql.init.mode=never"
+})
     public class RsvpRepositoryTest {
     @Autowired private DataSource dataSource;
     @Autowired private RsvpRepository repo;

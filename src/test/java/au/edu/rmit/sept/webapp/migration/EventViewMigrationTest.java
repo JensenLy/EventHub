@@ -7,6 +7,7 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
@@ -15,8 +16,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+@Transactional
 @TestPropertySource(properties = {
-    "spring.datasource.url=jdbc:mysql://localhost:3306/ProcessToolsDB",
+    "spring.datasource.url=jdbc:mysql://localhost:3307/ProcessToolsDB_Test",
     "spring.datasource.username=admin",
     "spring.datasource.password=password123",
     "spring.jpa.hibernate.ddl-auto=none",

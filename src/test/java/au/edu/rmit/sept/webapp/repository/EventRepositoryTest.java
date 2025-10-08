@@ -19,6 +19,7 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.transaction.annotation.Transactional;
 
 import au.edu.rmit.sept.webapp.model.Event;
 
@@ -28,6 +29,7 @@ import au.edu.rmit.sept.webapp.model.Event;
  */
 @SpringBootTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+@Transactional
 @TestPropertySource(properties = {
     "spring.datasource.url=jdbc:mysql://localhost:3307/ProcessToolsDB_Test",
     "spring.datasource.username=admin",
