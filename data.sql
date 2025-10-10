@@ -2,7 +2,9 @@ INSERT IGNORE INTO categories (name) VALUES
 ('Social'),
 ('Career'),
 ('Hackathon'),
-('Meetup');
+('Meetup'),
+('Sports'),
+('Festival');
 
 INSERT IGNORE INTO users (name, email, password, role, status)
 VALUES
