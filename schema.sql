@@ -3,6 +3,7 @@ DROP TABLE IF EXISTS event_categories;
 DROP TABLE IF EXISTS events;
 DROP TABLE IF EXISTS users;
 DROP TABLE IF EXISTS categories;
+DROP TABLE IF EXISTS user_preferred_category;
 
 CREATE TABLE categories (
   category_id BIGINT AUTO_INCREMENT PRIMARY KEY,
@@ -78,4 +79,18 @@ CREATE TABLE rsvp (
     ON DELETE CASCADE
     ON UPDATE CASCADE,
   CONSTRAINT uc_user_event UNIQUE (user_id, event_id)
+);
+
+CREATE TABLE user_preferred_category (
+  user_id BIGINT NOT NULL,
+  category_id BIGINT NOT NULL,
+  PRIMARY KEY (user_id, category_id),
+  CONSTRAINT fk_upc_user FOREIGN KEY (user_id)
+    REFERENCES users(user_id)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+  CONSTRAINT fk_upc_category FOREIGN KEY (category_id)
+    REFERENCES categories(category_id)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
 );

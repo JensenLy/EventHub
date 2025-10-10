@@ -95,8 +95,8 @@ public class ProfileEditController {
               throw new IllegalArgumentException("Invalid gender: " + gender);
           }
 
-          if (categoryIds != null && categoryIds.size() > 3) {
-              ra.addFlashAttribute("errorMessage", "You can select up to 3 categories only.");
+          if (categoryIds != null && categoryIds.size() > 5) {
+              ra.addFlashAttribute("errorMessage", "You can select up to 5 categories only.");
               return "redirect:/rsvp/" + userId + "/my-rsvps?tab=profile";
           }
 

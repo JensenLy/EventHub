@@ -48,7 +48,7 @@
         </label>
 
         <label style="display: flex; align-items: center; justify-content: space-between;">
-          <span>Select up to 3 preferred categories:</span>
+          <span>Select up to 5 preferred categories:</span>
           <button 
               type="submit" 
               name="resetCategories" 
@@ -74,7 +74,7 @@
         <!--Prevents user to select more than 3 preferred categories-->
         <script>
           document.addEventListener("DOMContentLoaded", function() {
-            const maxCategories = 3;
+            const maxCategories = 5;
             const checkboxes = document.querySelectorAll('#preferredCategories input[type="checkbox"]');
 
             checkboxes.forEach(checkbox => {

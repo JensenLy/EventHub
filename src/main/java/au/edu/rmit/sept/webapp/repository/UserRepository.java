@@ -132,7 +132,7 @@ public class UserRepository {
    */
   public List<Long> getUserPreferredCategories(Long userId)
   {
-    String sql = "SELECT category_id FROM USER_PREFERRED_CATEGORY WHERE user_id = ?";
+    String sql = "SELECT category_id FROM user_preferred_category WHERE user_id = ?";
     return jdbcTemplate.queryForList(sql, Long.class, userId);
   }
 
@@ -141,10 +141,10 @@ public class UserRepository {
    */
   public void saveUserPreferredCategories(Long userId, List<Long> categoryIds)
   {
-    String sql = "DELETE FROM USER_PREFERRED_CATEGORY WHERE user_id = ?";
+    String sql = "DELETE FROM user_preferred_category WHERE user_id = ?";
     jdbcTemplate.update(sql,userId);
 
-    sql = "INSERT INTO USER_PREFERRED_CATEGORY (user_id, category_id) VALUES (?, ?)";
+    sql = "INSERT INTO user_preferred_category (user_id, category_id) VALUES (?, ?)";
     for (Long categoryId : categoryIds) {
         jdbcTemplate.update(sql, userId, categoryId);
     }
@@ -155,7 +155,7 @@ public class UserRepository {
    */
   public void resetUserSavedPreferredCategories(Long userId)
   {
-    String sql = "DELETE FROM USER_PREFERRED_CATEGORY WHERE user_id = ?";
+    String sql = "DELETE FROM user_preferred_category WHERE user_id = ?";
     jdbcTemplate.update(sql,userId);
   }
 

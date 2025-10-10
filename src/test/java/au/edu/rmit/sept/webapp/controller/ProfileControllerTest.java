@@ -130,11 +130,11 @@ class ProfileControllerTest {
   }
 
   @Test
-  void post_edit_prevents_more_than_3_categories() throws Exception {
+  void post_edit_prevents_more_than_5_categories() throws Exception {
       when(currentUserService.getCurrentUserId()).thenReturn(1L);
 
       // submit 4 category IDs
-      List<String> categoryIds = List.of("1","2","3","4");
+      List<String> categoryIds = List.of("1","2","3","4","5","6");
 
       mvc.perform(post("/profile/edit")
               .with(user("dummy@example.com").roles("USER"))
@@ -146,16 +146,16 @@ class ProfileControllerTest {
               .param("categoryIds", categoryIds.toArray(new String[0])))
           .andExpect(status().is3xxRedirection())
           .andExpect(redirectedUrl("/rsvp/1/my-rsvps?tab=profile"))
-          .andExpect(flash().attribute("errorMessage", "You can select up to 3 categories only."));
+          .andExpect(flash().attribute("errorMessage", "You can select up to 5 categories only."));
   }
 
   @Test
-  void post_edit_saves_up_to_3_categories() throws Exception {
+  void post_edit_saves_up_to_5_categories() throws Exception {
       Long userId = 1L;
       when(currentUserService.getCurrentUserId()).thenReturn(userId);
 
       // Simulate user selecting 3 categories
-      List<String> selectedCategories = List.of("1", "2", "3");
+      List<String> selectedCategories = List.of("1", "2", "3","4","5");
 
       mvc.perform(post("/profile/edit")
               .with(user("dummy@example.com").roles("USER"))
@@ -173,7 +173,7 @@ class ProfileControllerTest {
       verify(userService).updateProfile(eq(userId), eq("Test User"), eq(""), eq("Some bio"), eq("female"));
 
       // check if preferred categories are saved
-      verify(userService).saveUserPreferredCategories(eq(userId), eq(List.of(1L, 2L, 3L)));
+      verify(userService).saveUserPreferredCategories(eq(userId), eq(List.of(1L, 2L, 3L, 4L, 5L)));
   }
 
   @Test
