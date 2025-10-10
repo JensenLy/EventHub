@@ -5,7 +5,7 @@
   th:replace="~{components/layout :: layout(~{::title}, ~{::section})}"
 >
   <head>
-    <title>Organizer Dashboard</title>
+    <title>Admin Dashboard</title>
     <link
       rel="stylesheet"
       th:href="@{/styles.css(v=${#temporals.format(#temporals.createNow(),'yyyyMMddHHmmss')})}"
@@ -16,29 +16,13 @@
       <!-- Hero -->
       <div class="hero">
         <div class="hero-text">
-          <h1>Create new &amp; exciting events</h1>
-          <p>Welcome to admin dashboard!</p>
-          <div class="hero-cta">
-            <a th:href="@{/eventPage}" class="btn btn-dark">Create Event</a>
-            <a th:href="@{/}" class="btn btn-light">Explore Events</a>
-          </div>
-        </div>
-      </div>
-      <div class="hero-media">
-        <div class="media-placeholder">
-          <div class="hero-wrap">
-            <img
-              class="hero-img"
-              th:src="@{/homePage.jpg}"
-              alt="Organizer hero"
-            />
-          </div>
+          <h1>Welcome to admin dashboard!</h1>
         </div>
       </div>
 
       <div class="divider"></div>
       <!-- Upcoming Events -->
-      <h2 class="section-title">Upcoming events</h2>
+      <h2 class="section-title">Reported events</h2>
 
       <!-- Error message -->
       <div th:if="${error}" class="alert alert-error" th:text="${error}">
@@ -47,7 +31,7 @@
 
       <!-- Empty state -->
       <div th:if="${#lists.isEmpty(events)}" class="empty-events">
-        You haven’t created any upcoming events yet.
+        You haven’t had any reported event yet...
       </div>
 
       <!-- Event Cards -->
@@ -56,9 +40,9 @@
           <div class="card-body">
             <!-- Title + inline categories -->
             <div class="title-row">
-              <h3 class="card-title" th:text="${ev.name}">Event name</h3>
-              <div class="chip-row-inline" th:if="${ev.category != null}">
-                <span class="chip" th:each="c : ${ev.category}" th:text="${c}"
+              <h3 class="card-title" th:text="${ev.event.name}">Event name</h3>
+              <div class="chip-row-inline" th:if="${ev.event.category != null}">
+                <span class="chip" th:each="c : ${ev.event.category}" th:text="${c}"
                   >Category</span
                 >
               </div>
@@ -66,46 +50,52 @@
 
             <p
               class="muted"
-              th:text="${#temporals.format(ev.dateTime, 'EEE, d MMM yyyy HH:mm')}"
+              th:text="${#temporals.format(ev.event.dateTime, 'EEE, d MMM yyyy HH:mm')}"
             >
               Date
             </p>
-            <p class="muted" th:text="${ev.location}">Location</p>
+            <p class="muted" th:text="${ev.event.location}">Location</p>
+
+            <p>Reports:</p>
+            <ul>
+                <li th:each="entry : ${ev.reportCounts.entrySet()}" 
+                    th:text="${entry.key + ': ' + entry.value}">Status: Count</li>
+            </ul>
 
             <!-- View Details button -->
             <button
               type="button"
               class="btn btn-dark"
-              th:attr="data-event-id=${ev.eventId}"
+              th:attr="data-event-id=${ev.event.eventId}"
               onclick="openEventModal(this)"
             >
               View Details
             </button>
 
             <!-- Hidden modal template for THIS event -->
-            <template th:id="'event-template-' + ${ev.eventId}">
+            <template th:id="'event-template-' + ${ev.event.eventId}">
               <th:block
-                th:replace="~{components/eventDetail :: eventDetails(event=${ev})}"
+                th:replace="~{components/eventDetail :: eventDetails(event=${ev.event})}"
               ></th:block>
             </template>
 
             <div class="card-actions">
               <a
                 class="btn btn-dark"
-                th:href="@{|/admin/events/${ev.eventId}/reports|}"
+                th:href="@{|/admin/events/${ev.event.eventId}/reports|}"
               >
                 View Reports
               </a>
 
               <a
                 class="btn btn-blue"
-                th:href="@{'/event/edit/' + ${ev.eventId}}"
+                th:href="@{'/admin/event/edit/' + ${ev.event.eventId}}"
               >
                 Edit
               </a>
 
               <form
-                th:action="@{'/event/delete/' + ${ev.eventId}}"
+                th:action="@{'/event/delete/' + ${ev.event.eventId}}"
                 method="post"
                 class="inline"
                 onsubmit="return confirm('Are you sure you want to delete this event?');"
@@ -116,6 +106,18 @@
           </div>
         </article>
       </div>
+
+      <div class="divider"></div>
+      <div class="hero">
+        <div class="hero-text">
+          <h1>Create new events</h1>
+          <div class="hero-cta">
+            <a th:href="@{/eventPage}" class="btn btn-dark">Create Event</a>
+            <a th:href="@{/}" class="btn btn-light">Explore Events</a>
+          </div>
+        </div>
+      </div>
+
       <!-- Global modal (single instance on the page) -->
       <div id="eventModal" class="modal">
         <div class="modal-content">
