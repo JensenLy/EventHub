@@ -24,12 +24,19 @@ public class ReportRepository {
             rs.getLong("user_id"),
             rs.getLong("event_id"),
             rs.getString("note"),
+            rs.getString("reportStatus"),
             rs.getTimestamp("created_at").toLocalDateTime()
         );
     
     public List<Report> getAllReports() { 
         String sql = "SELECT * FROM reports";
         List<Report> reports = jdbcTemplate.query(sql, MAPPER);
+        return reports;
+    }
+
+    public List<Report> getReportsByEvent(long eventId) { 
+        String sql = "SELECT * FROM reports WHERE event_id = ?";
+        List<Report> reports = jdbcTemplate.query(sql, MAPPER, eventId);
         return reports;
     }
     
