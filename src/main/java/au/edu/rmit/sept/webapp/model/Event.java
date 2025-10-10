@@ -79,7 +79,7 @@ public class Event {
                   this.categories = categories;
                   this.capacity = capacity;
                   this.price = price;
-                  this.imageUrl = "/meetup.jpg";
+                  this.imageUrl = null;
                   this.detailedDescription = "";
                   this.agenda = "";
                   this.speakers = "";
