@@ -19,6 +19,7 @@ import au.edu.rmit.sept.webapp.service.CategoryService;
 import au.edu.rmit.sept.webapp.service.CurrentUserService;
 import au.edu.rmit.sept.webapp.service.EventService;
 import au.edu.rmit.sept.webapp.service.RSVPService;
+import au.edu.rmit.sept.webapp.service.UserService;
 import jakarta.validation.Valid;
 
 @Controller
@@ -26,17 +27,17 @@ public class EventController {
     private final EventService eventService;
     private final CategoryService categoryService;
     private final RSVPService rsvpService;
-
+    private final UserService userService;
     private final CurrentUserService currentUserService;
 
     // constructor injection for services
-    public EventController(EventService Service, CategoryService categoryService, RSVPService rsvpService, CurrentUserService currentUserService)
+    public EventController(EventService Service, CategoryService categoryService, RSVPService rsvpService, CurrentUserService currentUserService, UserService userService)
     {
       this.eventService = Service;
       this.categoryService = categoryService;
       this.rsvpService = rsvpService;
-
       this.currentUserService = currentUserService;
+      this.userService = userService;
     }
   
   // ================= CREATE EVENT =================
@@ -213,6 +214,15 @@ public class EventController {
     {
       eventService.filterEventsByCategory(categoryId);
       return "index";
+    }
+
+    @GetMapping("/recommendations")
+    public String showRecommendations(Model model) {
+        long currentUserId = currentUserService.getCurrentUserId();
+        List<Long> preferredCategoryIds = userService.getUserPreferredCategories(currentUserId);
+        List<Event> recommendedEvents = eventService.getRecommendedEvents(preferredCategoryIds);
+        model.addAttribute("recommendedEvents", recommendedEvents);
+        return "recommendations";
     }
 
     // ================= VIEW EVENT DETAILS =================

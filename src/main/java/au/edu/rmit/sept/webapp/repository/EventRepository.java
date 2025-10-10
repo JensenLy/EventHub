@@ -2,9 +2,11 @@ package au.edu.rmit.sept.webapp.repository;
 
 import java.sql.PreparedStatement;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Collections;
 import java.util.stream.Collectors;
 
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -460,6 +462,37 @@ public int updateEventWithAllExtraInfo(Event event, List<Long> categoryIds) {
       }
   }
   return rows;
+}
+
+public List<Event> getRecommendedEvents(List<Long> categoryIds){
+    if (categoryIds == null || categoryIds.isEmpty()) {
+      return List.of();
+    }
+
+    String inSql = String.join(",",Collections.nCopies(categoryIds.size(), "?"));
+
+    String sql = """
+        SELECT e.*, COUNT(ec.category_id) AS match_count
+        FROM events e
+        JOIN event_categories ec ON e.event_id = ec.event_id
+        WHERE ec.category_id IN (%s)
+        AND e.date_time > NOW()
+        GROUP BY e.event_id
+        ORDER BY match_count DESC, e.date_time ASC
+        """.formatted(inSql);
+
+        return jdbcTemplate.query(sql, (rs, rowNum) -> {
+            Event event = new Event();
+            event.setEventId(rs.getLong("event_id"));
+            event.setName(rs.getString("name"));
+            event.setDesc(rs.getString("description")); 
+            event.setCreatedByUserId(rs.getLong("created_by_user_id"));
+            event.setDateTime(rs.getTimestamp("date_time").toLocalDateTime()); 
+            event.setLocation(rs.getString("location"));
+            event.setCapacity(rs.getInt("capacity"));
+            event.setPrice(rs.getBigDecimal("price"));
+            return event;
+        }, categoryIds.toArray());
 }
 }
 
