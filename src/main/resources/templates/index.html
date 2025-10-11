@@ -36,10 +36,30 @@
         Browsing events in <span class="muted">RMIT</span>
       </h2>
 
+      <!-- Search Form -->
+      <form class="search" method="get" th:action="@{/}">
+        <input 
+          name="search"
+          th:value="${searchQuery}"
+          placeholder="Search events by name, description, or location..."
+          aria-label="Search events"
+          autocomplete="off" />
+        <!-- Preserve category filter when searching -->
+        <input type="hidden" name="categoryId" th:value="${selectedCategoryId}" th:if="${selectedCategoryId != null}" />
+        <button type="submit" class="mic">🔍</button>
+      </form>
+
+          <!-- Display search results info -->
+      <div th:if="${searchQuery != null && !searchQuery.isEmpty()}" class="search-info" style="margin: 1rem 0; color: #666;">
+        <span th:text="'Showing results for: \'' + ${searchQuery} + '\''">Search results</span>
+        <a th:href="@{/(categoryId=${selectedCategoryId})}" style="margin-left: 1rem; color: #007bff; text-decoration: none;">Clear search</a>
+      </div>
+
+
+
       <!-- Labels/filters (static placeholders for now) -->
       <div class="chip-row">
         <div th:replace="~{components/eventFilters :: filterForm}"></div>
-  
       </div>
 
       <!-- <div class="createEventBtn">

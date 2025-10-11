@@ -1,27 +1,39 @@
-<!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<body>
-    <div th:fragment="filterForm">
-        <form th:action="@{/}" method="get">
-            
-            
-            <button th:each="cat : ${categories}"
-                    type="submit"
-                    name="categoryId"
-                    th:value="${cat.categoryId}"
-                    th:text="${cat.name}"
-                    th:classappend="${cat.categoryId == selectedCategoryId} ? 'btn-dark' : 'btn-outline-dark'"
-                    class="btn">
-            </button>
 
-            <button type="submit"
+<div th:fragment="filterForm">
+  <form method="get" th:action="@{/}" style="display: inline;">
+
+     <button type="submit"
                     name="categoryId"
                     value=""
                     th:classappend="${selectedCategoryId == null} ? 'btn-dark' : 'btn-outline-dark'"
                     class="btn">
                 All
             </button>
-        </form>
-    </div>
-</body>
-</html>
+    
+    <!-- Preserve search query when clicking "All" -->
+    <input type="hidden" name="search" th:value="${searchQuery}" th:if="${searchQuery != null && !searchQuery.isEmpty()}" />
+  </form>
+
+ <form 
+    th:each="category : ${categories}" 
+    method="get" 
+    th:action="@{/}" 
+    style="display: inline;"
+  >
+    <!-- Hidden fields -->
+    <input type="hidden" name="categoryId" th:value="${category.categoryId}" />
+    <input type="hidden" name="search" 
+           th:value="${searchQuery}" 
+           th:if="${searchQuery != null and !searchQuery.isEmpty()}" />
+
+    <!-- Category button -->
+    <button 
+      type="submit" 
+      class="btn"
+      th:classappend="${selectedCategoryId != null and selectedCategoryId.equals(category.categoryId)} ? 'btn-dark' : 'btn-outline-dark'"
+      th:text="${category.name}"
+    >
+      Category
+    </button>
+  </form>
+</div>
