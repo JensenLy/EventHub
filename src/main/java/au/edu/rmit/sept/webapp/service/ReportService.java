@@ -43,4 +43,8 @@ public class ReportService {
     public boolean updateReportStatus(Long reportId, String newStatus){
         return reportRepository.updateReportStatus(reportId, newStatus);
     }
+
+    public boolean resolveAllByEvent(Long eventId){
+        return reportRepository.resolveAllByEvent(eventId);
+    }
 }

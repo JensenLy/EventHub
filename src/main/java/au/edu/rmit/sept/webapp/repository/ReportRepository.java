@@ -78,4 +78,10 @@ public class ReportRepository {
         int rowsAffected = jdbcTemplate.update(sql, newStatus, reportId);
         return rowsAffected > 0;
     }
+
+    public boolean resolveAllByEvent(Long eventId){
+        String sql = "UPDATE reports SET reportStatus = ? WHERE event_id = ?";
+        int rowsAffected = jdbcTemplate.update(sql, "resolved", eventId);
+        return rowsAffected > 0;
+    }
 }
