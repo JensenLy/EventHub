@@ -199,6 +199,17 @@ class AdminControllerTest {
         Mockito.verify(eventService).deleteEventbyId(1L);
     }
 
+    @Test
+    @WithMockUser(username="admin", roles={"ADMIN"})
+    void viewDeletedEvent_ShowsEventDetail() throws Exception {
+        Mockito.when(eventService.findById(1L)).thenReturn(event1);
+
+        mockMvc.perform(get("/admin/event/bin/view/1"))
+               .andExpect(status().isOk())
+               .andExpect(model().attributeExists("event"))
+               .andExpect(view().name("eventDetail"));
+    }
+
 }
 
 
