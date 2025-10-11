@@ -3,6 +3,7 @@
   <body>
     <th:block th:fragment="head">
       <link rel="stylesheet" th:href="@{/styles.css}" />
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
     </th:block>
 
     <!-- PAGE HEADER fragment -->
@@ -28,15 +29,23 @@
               <a th:href="@{/organiser/dashboard}" class="nav-button user" style="margin-right: 1rem;">DASHBOARD</a>
             </div>
 
-              <div sec:authorize="hasRole('USER')">
-              <a th:href="@{'/rsvp/' + ${currentUserId} + '/my-rsvps'}" class="nav-button user" style="margin-right: 1rem;">MY RSVP</a>
-            </div>
+              <div sec:authorize="hasRole('USER')" style="margin-right: 1.5rem;">
+                <a th:href="@{'/rsvp/' + ${currentUserId} + '/my-rsvps'}" class="nav-button user-nav">
+                  <i class="fas fa-calendar-check"></i> MY RSVP
+                </a>
+              </div>
           
-            <span class="user-welcome">welcome :</span>
-            <span class="user-welcome" sec:authentication="name">Username</span>
-            <form th:action="@{/logout}" method="post" style="display: inline;">
-              <button type="submit" class="nav-button" >Logout</button>
-            </form>
+              <div class="user-info">
+                <span class="username">
+                  <i class="fas fa-user"></i>
+                  <span sec:authentication="name">Username</span>
+                </span>
+                <form th:action="@{/logout}" method="post" style="display: inline-block;">
+                  <button type="submit" class="nav-button logout-btn">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                  </button>
+                </form>
+              </div>
           </div>
         </div>
       </div>
