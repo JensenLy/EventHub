@@ -1,9 +1,19 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html
+  xmlns:th="http://www.thymeleaf.org"
+  lang="en"
+>
+
 <head>
+    <link
+      rel="stylesheet"
+      th:href="@{/styles.css(v=${#dates.format(#dates.createNow(),'yyyyMMddHHmmss')})}"
+    />
   <title>Recommended Events</title>
 </head>
 <body>
+      <header th:replace="~{components/header :: header}"></header>
+
   <h2>Recommended Events for You</h2>
 
 <!-- Showing event cards-->
@@ -64,17 +74,17 @@
           </template>
 
           <!-- RSVP Buttons -->
-              <form th:action="@{'/rsvp/' + ${currentUserId} + '/event/' + ${event.eventId}}" method="get" class="rsvp-form">
+              <form th:action="@{'/rsvp/' + ${currentUserId} + '/event/' + ${event.eventId}  + '/confirm/recommendations'}" method="post" class="rsvp-form">
                 <button 
                   type="submit"
                   style="width:100%"
-                  th:classappend="${rsvpStatusMap[event.eventId]} ? 'btn btn-green submit-button' : 'btn btn-dark submit-button'"
-                  th:disabled="${rsvpStatusMap[event.eventId]}"
-                  th:text="${rsvpStatusMap[event.eventId]} ? 'RSVPed' : 'RSVP'"
+                 th:classappend="${rsvpStatusMap != null and rsvpStatusMap[event.eventId]} ? 'btn btn-green submit-button' : 'btn btn-dark submit-button'"
+                  th:disabled="${rsvpStatusMap != null and rsvpStatusMap[event.eventId]}"
+                    th:text="${rsvpStatusMap != null and rsvpStatusMap[event.eventId]} ? 'RSVPed' : 'RSVP'"
                 >RSVP</button>
               </form>
-              <div th:if = "${rsvpStatusMap[event.eventId]}">
-                <form th:action="@{'/rsvp/' + ${currentUserId} + '/event/' + ${event.eventId} + '/delete'}" method="post"
+                <div th:if="${rsvpStatusMap != null and rsvpStatusMap[event.eventId]}">
+                <form th:action="@{'/rsvp/' + ${currentUserId} + '/event/' + ${event.eventId} + '/delete/recommendations'}" method="post"
                       onsubmit="return confirm('Are you sure you want to DELETE this RSVP ?');">
                   <button 
                     type="submit"
@@ -86,6 +96,29 @@
               </div>
         </article>
       </div>
-  <a th:href="@{/}" class="btn btn-light">← Back to Home</a>
+  <a th:href="@{/}" class="btn btn-light">Back to Home</a>
+      <footer th:replace="~{components/footer :: footer}"></footer>
+  <div id="eventModal" class="modal">
+        <div class="modal-content">
+          <span class="close" onclick="closeEventModal()">&times;</span>
+          <div id="modal-body"></div>
+        </div>
+      </div>
+      <script>
+        function openEventModal(button) {
+          const eventId = button.getAttribute("data-event-id");
+          const template = document.getElementById("event-template-" + eventId);
+          if (!template) return;
+          document.getElementById("modal-body").innerHTML = template.innerHTML;
+          document.getElementById("eventModal").style.display = "block";
+        }
+        function closeEventModal() {
+          document.getElementById("eventModal").style.display = "none";
+        }
+        window.onclick = function (event) {
+          const modal = document.getElementById("eventModal");
+          if (event.target === modal) closeEventModal();
+        };
+      </script>
 </body>
 </html>
