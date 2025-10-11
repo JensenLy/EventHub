@@ -298,6 +298,54 @@ public class EventRepository {
     jdbcTemplate.update(sql, eventId);
   }
 
+  // get all the soft deleted events
+  public List<Event> getSoftDeletedEvents()
+    {
+      String sql = """
+          SELECT  e.*, c.name as category_name
+          FROM events e
+          LEFT JOIN event_categories ec ON e.event_id = ec.event_id
+          LEFT JOIN categories c ON ec.category_id = c.category_id
+          WHERE e.event_status = FALSE
+          ORDER BY e.date_time DESC
+          """;
+
+      return jdbcTemplate.query(sql, rs -> {
+        Map<Long, Event> events = new LinkedHashMap<>();
+
+        while (rs.next()) {
+            Long eventId = rs.getLong("event_id");
+            Event ev = events.get(eventId);
+
+            if (ev == null) {
+                ev = new Event(
+                    eventId,
+                    rs.getString("name"),
+                    rs.getString("description"),
+                    rs.getObject("created_by_user_id") != null ? rs.getLong("created_by_user_id") : null,
+                    rs.getTimestamp("date_time").toLocalDateTime(),
+                    rs.getString("location"),
+                    new ArrayList<>(), // categories init
+                    rs.getObject("capacity") != null ? rs.getInt("capacity") : null,
+                    rs.getBigDecimal("price")
+                );
+                ev.setDetailedDescription(rs.getString("detailed_description"));
+                ev.setAgenda(rs.getString("agenda"));
+                ev.setSpeakers(rs.getString("speakers"));
+                ev.setDressCode(rs.getString("dress_code"));
+                events.put(eventId, ev);
+            }
+
+            String catName = rs.getString("category_name");
+            if (catName != null) {
+                ev.getCategory().add(catName);
+            }
+        }
+
+        return new ArrayList<>(events.values());
+      });
+    }
+
   // filter events by category
   public List<Event> filterEventsByCategory(Long categoryId)
   {

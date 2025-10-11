@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en"
+      th:replace="~{components/layout :: layout(~{::title}, ~{::section})}">
+  <head>
+    <title>Admin — Recycle Bin</title>
+  </head>
+  <body>
+    <section class="page">
+      <a class="btn btn-light" th:href="@{/admin/dashboard}">← Back to dashboard</a>
+
+      <h1 class="section-title">Recycle Bin</h1>
+      <p class="muted">Soft-deleted events. You can restore or permanently delete them.</p>
+
+      <div th:if="${#lists.isEmpty(deletedEvents)}" class="empty-events">
+        No deleted events.
+      </div>
+
+      <div th:if="${!#lists.isEmpty(deletedEvents)}" class="table-wrap">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Event ID</th>
+              <th>Name</th>
+              <th>Date</th>
+              <th>Location</th>
+              <th>Organiser</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr th:each="ev : ${deletedEvents}">
+              <td th:text="${ev.eventId}">1</td>
+              <td th:text="${ev.name}">Event name</td>
+              <td th:text="${#temporals.format(ev.dateTime, 'EEE, d MMM yyyy HH:mm')}">Date</td>
+              <td th:text="${ev.location}">Location</td>
+              <td th:text="${ev.createdByUserId}">Organiser</td>
+              <td>
+                <div style="display:flex; gap:0.5rem;">
+                  <form th:action="@{|/admin/event/restore/${ev.eventId}|}" method="post" th:object="${ev}">
+                    <button type="submit" class="btn btn-blue">Restore</button>
+                  </form>
+
+                  <form th:action="@{|/admin/event/delete/${ev.eventId}|}" method="post"
+                        onsubmit="return confirm('Permanently delete this event? This action cannot be undone.');">
+                    <button type="submit" class="btn btn-danger">Delete Permanently</button>
+                  </form>
+
+                  <!-- <form
+                    th:action="@{'/event/delete/' + ${ev.event.eventId}}"
+                    method="post"
+                    class="inline"
+                    onsubmit="return confirm('Are you sure you want to delete this event?');"
+                  >
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                  </form> -->
+
+                  <a class="btn btn-dark" th:href="@{|/admin/event/view/${ev.eventId}|}">View</a>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </body>
+</html>

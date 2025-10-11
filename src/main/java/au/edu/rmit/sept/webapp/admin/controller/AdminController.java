@@ -175,17 +175,17 @@ public class AdminController {
             return "redirect:/admin/dashboard";
         }
 
-        eventService.softDeleteEventbyId(eventId);
+        eventService.softDeleteEvent(eventId);
         redirectAttributes.addFlashAttribute("successMessage", "Event moved to bin");
         return "redirect:/admin/dashboard";
     }
 
 
     // view recycle bin (soft-deleted events)
-    // @GetMapping("/event/bin")
-    // public String eventBin(Model model) {
-    //     List<Event> deletedEvents = eventService.getSoftDeletedEvents();
-    //     model.addAttribute("deletedEvents", deletedEvents);
-    //     return "admin/eventBin"; // create Thymeleaf view admin/eventBin.html
-    // }
+    @GetMapping("/event/bin")
+    public String eventBin(Model model) {
+        List<Event> deletedEvents = eventService.getSoftDeletedEvents();
+        model.addAttribute("deletedEvents", deletedEvents);
+        return "admin/eventBin"; 
+    }
 }

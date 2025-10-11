@@ -107,8 +107,16 @@ public class EventService {
   /**
    * soft delete an event by its ID.
    */
-  public void softDeleteEventbyId(long eventId) {
+  public void softDeleteEvent(Long eventId) {
      eventRepo.softDeleteEvent(eventId);
+  }
+
+
+  /**
+   *  get soft deleted events
+   */
+  public List<Event> getSoftDeletedEvents() {
+     return eventRepo.getSoftDeletedEvents();
   }
 
   /**
