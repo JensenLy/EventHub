@@ -1,7 +1,10 @@
 package au.edu.rmit.sept.webapp.controller;
 
 import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -221,7 +224,16 @@ public class EventController {
         long currentUserId = currentUserService.getCurrentUserId();
         List<Long> preferredCategoryIds = userService.getUserPreferredCategories(currentUserId);
         List<Event> recommendedEvents = eventService.getRecommendedEvents(preferredCategoryIds);
+
+       Map<Long, Boolean> rsvpStatusMap = new HashMap<>();
+        for (Event event : recommendedEvents) {
+            boolean hasRsvped = rsvpService.hasUserRsvped(currentUserId, event.getEventId());
+            rsvpStatusMap.put(event.getEventId(), hasRsvped);
+}
+
         model.addAttribute("recommendedEvents", recommendedEvents);
+        model.addAttribute("rsvpStatusMap", rsvpStatusMap);
+        model.addAttribute("currentUserId", currentUserService.getCurrentUserId());
         return "recommendations";
     }
 
