@@ -204,6 +204,21 @@ public class AdminController {
         return "redirect:/admin/event/bin";
     }
 
+    //delete events permanently
+    @PostMapping("/event/bin/delete/{id}")
+    public String deleteEvent(@PathVariable("id") Long eventId, RedirectAttributes redirectAttributes)
+    {
+        Event event = eventService.findById(eventId);
+        if (event == null) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Event not found");
+            return "redirect:/admin/dashboard";
+        }
+
+        eventService.deleteEventbyId(eventId);
+        redirectAttributes.addFlashAttribute("successMessage", "Event deleted");
+        return "redirect:/admin/event/bin";
+    }
+
     @PostMapping("/event/dismiss/{id}")
     public String dismissEvent(@PathVariable("id") Long eventId, RedirectAttributes redirectAttributes)
     {
