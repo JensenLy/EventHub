@@ -110,6 +110,41 @@ class AdminControllerTest {
                .andExpect(model().attributeExists("users"))
                .andExpect(view().name("admin/userManagement"));
     }
+
+    @Test
+    @WithMockUser(username="admin", roles={"ADMIN"})
+    void softDeleteEvent_MovesToBinAndRedirects() throws Exception {
+        Mockito.when(eventService.findById(1L)).thenReturn(event1);
+
+        mockMvc.perform(post("/admin/event/softdelete/1").with(csrf()))
+               .andExpect(status().is3xxRedirection())
+               .andExpect(redirectedUrl("/admin/dashboard"));
+
+        Mockito.verify(eventService).softDeleteEvent(1L);
+    }
+
+    @Test
+    @WithMockUser(username="admin", roles={"ADMIN"})
+    void eventBin_ShowsDeletedEvents() throws Exception {
+        Mockito.when(eventService.getSoftDeletedEvents()).thenReturn(List.of(event1));
+
+        mockMvc.perform(get("/admin/event/bin"))
+               .andExpect(status().isOk())
+               .andExpect(model().attributeExists("deletedEvents"))
+               .andExpect(view().name("admin/eventBin"));
+    }
+
+    @Test
+    @WithMockUser(username="admin", roles={"ADMIN"})
+    void restoreEvent_PostRestoresAndRedirectsToBin() throws Exception {
+        Mockito.when(eventService.findById(1L)).thenReturn(event1);
+
+        mockMvc.perform(post("/admin/event/bin/restore/1").with(csrf()))
+               .andExpect(status().is3xxRedirection())
+               .andExpect(redirectedUrl("/admin/event/bin"));
+
+        Mockito.verify(eventService).restoreEvent(1L);
+    }
 }
 
 

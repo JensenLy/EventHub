@@ -272,7 +272,7 @@ void cleanUp() {
       saved.setDressCode("Business casual");
 
       List<Long> categoryIdsUpdated = categoryIdsForNames(List.of("Social"));
-      int rows = repo.updateEventWithAllExtraInfo(saved, categoryIdsUpdated); // swap categories
+      int rows = repo.updateEventWithAllExtraInfo(saved, categoryIdsUpdated);
       assertEquals(1, rows);
 
       Map<String, Object> row = loadEventRow(eventId);
@@ -286,5 +286,76 @@ void cleanUp() {
 
       List<Long> joinIds = categoryIdsForEvent(eventId);
       assertEquals(1, joinIds.size(), "Should have exactly one category after update");
+  }
+
+  @Test
+  void softDelete_and_getSoftDeletedEvents() {
+    Event e = baseEvent("TestSoftDelete", "TestLoc", LocalDateTime.now().plusDays(3).withNano(0));
+    List<Long> categoryIdsCreated = categoryIdsForNames(List.of("Career", "Hackathon"));
+    Event saved = repo.createEventWithAllExtraInfo(e, categoryIdsCreated);
+    assertNotNull(saved.getEventId());
+
+    // soft delete
+    repo.softDeleteEvent(saved.getEventId());
+
+    // DB flag should be 0 (false)
+    Integer status = jdbc.queryForObject("SELECT event_status FROM events WHERE event_id = ?", Integer.class, saved.getEventId());
+    assertNotNull(status);
+    assertEquals(0, status.intValue());
+
+    // repository should return it in soft-deleted list
+    List<Event> deleted = repo.getSoftDeletedEvents();
+    assertTrue(deleted.stream().anyMatch(ev -> ev.getEventId().equals(saved.getEventId())));
+  }
+
+  @Test
+  void restoreEvent_restoresStatus_and_removesFromBin() {
+    Event e = baseEvent("TestRestore", "TestLoc", LocalDateTime.now().plusDays(4).withNano(0));
+    List<Long> categoryIdsCreated = categoryIdsForNames(List.of("Career"));
+    Event saved = repo.createEventWithAllExtraInfo(e, categoryIdsCreated);
+    assertNotNull(saved.getEventId());
+
+    repo.softDeleteEvent(saved.getEventId());
+    // restore
+    repo.restoreEvent(saved.getEventId());
+
+    Integer status = jdbc.queryForObject("SELECT event_status FROM events WHERE event_id = ?", Integer.class, saved.getEventId());
+    assertNotNull(status);
+    assertEquals(1, status.intValue());
+
+    List<Event> deleted = repo.getSoftDeletedEvents();
+    assertFalse(deleted.stream().anyMatch(ev -> ev.getEventId().equals(saved.getEventId())));
+  }
+
+  @Test
+  void deleteEventbyId_removesEventAndJoinRows() {
+    Event e = baseEvent("TestPermanentDelete", "TestLoc", LocalDateTime.now().plusDays(5).withNano(0));
+    List<Long> categoryIdsCreated = categoryIdsForNames(List.of("Career", "Hackathon"));
+    Event saved = repo.createEventWithAllExtraInfo(e, categoryIdsCreated);
+    assertNotNull(saved.getEventId());
+
+    // should have join rows
+    assertTrue(countJoinRows(saved.getEventId()) >= 1);
+
+    repo.deleteEventbyId(saved.getEventId());
+
+    Integer count = jdbc.queryForObject("SELECT COUNT(*) FROM events WHERE event_id = ?", Integer.class, saved.getEventId());
+    assertNotNull(count);
+    assertEquals(0, count.intValue(), "Event row should be deleted");
+
+    assertEquals(0, countJoinRows(saved.getEventId()), "Join rows should be removed");
+  }
+
+  @Test
+  void softDeleted_events_are_excluded_from_findUpcomingEventsSorted() {
+    Event e = baseEvent("TestExclude", "TestLoc", LocalDateTime.now().plusDays(6).withNano(0));
+    List<Long> categoryIdsCreated = categoryIdsForNames(List.of("Career"));
+    Event saved = repo.createEventWithAllExtraInfo(e, categoryIdsCreated);
+    assertNotNull(saved.getEventId());
+
+    // soft delete and ensure it's not returned in upcoming events
+    repo.softDeleteEvent(saved.getEventId());
+    List<Event> upcoming = repo.findUpcomingEventsSorted();
+    assertFalse(upcoming.stream().anyMatch(ev -> ev.getEventId().equals(saved.getEventId())));
   }
 }
