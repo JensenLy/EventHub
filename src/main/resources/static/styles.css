@@ -1,4 +1,4 @@
-/* Base */
+Base
 :root {
   --bg: #f9f9fb;
   --text: #2a2a33;
@@ -23,7 +23,6 @@ body {
   color: var(--text);
 }
 
-/* Layout hooks */
 .page {
   max-width: 1140px;
   margin: 0 auto;
