@@ -8,6 +8,7 @@
   --line: #e6e8ef;
   --chip: #f2f4f8;
   --shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+  --rsvped-bg: #e6ffe6;
 }
 * {
   box-sizing: border-box;
@@ -336,6 +337,11 @@ body {
   flex-direction: column;
   overflow: hidden;
   transition: all 0.3s ease;
+}
+
+.card-rsvped {
+  background: var(--rsvped-bg);
+  border-color: #90EE90;
 }
 
 .card:hover {
