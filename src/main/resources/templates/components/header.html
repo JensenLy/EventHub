@@ -6,27 +6,46 @@
       <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
     </th:block>
 
-    <!-- PAGE HEADER fragment -->
-    <header th:fragment="header">
-      <div class="topbar">
-        <div class="topbar-left">
-          <div class="logo"><img src="/favicon.svg" alt="EventHub Logo"><a href="/" class="link">Eventhub</a></div>
-          <form class="search">
-            <input type="text" placeholder="Search" aria-label="Search" />
-            <button type="button" class="mic">🎤</button>
-          </form>
-        </div>
-        <div class="topbar-right">
-          <div sec:authorize="!isAuthenticated()">
-            <a th:href="@{/register}" class="nav-button">Sign up</a>
-            <a th:href="@{/login}" class="nav-button">Log in</a>
+        <!-- Search -->
+        <form class="search" role="search" aria-label="Site search">
+          <input
+            class="search__input"
+            type="text"
+            placeholder="Search"
+            aria-label="Search"
+          />
+          <button type="button" class="search__mic" aria-label="Voice search">
+            🎤
+          </button>
+        </form>
+      </div>
+
+      <div class="topbar__right">
+        <!-- Right actions -->
+        <nav class="actions">
+          <!-- Logged out -->
+          <div class="actions__group" sec:authorize="!isAuthenticated()">
+            <a th:href="@{/register}" class="btn btn--ghost">✍️ Sign up</a>
+            <a th:href="@{/login}" class="btn btn--primary">🔐 Log in</a>
           </div>
 
-       
+          <!-- Logged in -->
+          <div
+            class="actions__group actions__group--auth"
+            sec:authorize="isAuthenticated()"
+          >
+            <div sec:authorize="hasRole('ORGANISER')">
+              <a th:href="@{/organiser/dashboard}" class="btn btn--ghost"
+                >📊 Organiser Dashboard</a
+              >
+            </div>
 
-          <div sec:authorize="isAuthenticated()">
-           <div sec:authorize="hasRole('ORGANISER')">
-              <a th:href="@{/organiser/dashboard}" class="nav-button user" style="margin-right: 1rem;">DASHBOARD</a>
+            <div sec:authorize="hasRole('USER')">
+              <a
+                th:href="@{'/rsvp/' + ${currentUserId} + '/my-rsvps'}"
+                class="btn btn--ghost"
+                >👤 My Dashboard</a
+              >
             </div>
 
               <div sec:authorize="hasRole('USER')" style="margin-right: 1.5rem;">
@@ -47,8 +66,8 @@
                 </form>
               </div>
           </div>
-        </div>
+        </nav>
       </div>
-    </header>
-  </body>
-</html>
+    </div>
+  </div>
+</header>
