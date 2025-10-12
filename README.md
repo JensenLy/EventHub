@@ -31,6 +31,7 @@ The DoD is in the github projects board labeled as "definition of done".
 below are the log-in information for student, and club organiser:
 
 ======== STUDENT ROLE ========
+
 Username: "dummy@example.com"
 Password: "password123"
 
@@ -38,12 +39,14 @@ Password: "password123"
 
 
 ======== STUDENT ROLE ========
+
 Username: "dummy@example.com"
 Password: "password123"
 
 ==============================
 
 ========= STUDENT ROLE ======= (they are being ban so they unable to log in or rsvp)
+
 Username: "dummy9@example.com"
 Password: "password123"
 
@@ -51,13 +54,15 @@ Password: "password123"
 
 
 ========= ORGANISER ROLE =======
+
 Username: "dummy5@example.com"
 Password: "password123"
 
 ==============================
 
 ========= ADMIN ROLE =======
-Username: "dumm7@example.com"
+
+Username: "dummy7@example.com"
 Password: "password123"
 
 ==============================
