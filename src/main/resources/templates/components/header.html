@@ -1,79 +1,115 @@
 <header
   th:fragment="header"
   xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+  style="
+    background: #fff;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    font-family: 'Inter', system-ui, sans-serif;
+  "
 >
-  <div class="topbar">
-    <div class="topbar__inner">
-      <div class="topbar__left">
-        <!-- Brand -->
-        <a href="/" class="brand" aria-label="Eventhub home">
-          <img src="/favicon.svg" alt="" class="brand__logo" />
-          <span class="brand__name">EventHub</span>
-        </a>
+  <div class="topbar__inner" 
+       style="display: flex; align-items: center; justify-content: space-between; padding: 0.75rem 2rem;">
+    
+    <!-- Left section -->
+    <div class="topbar__left" style="display: flex; align-items: center; gap: 1.5rem;">
+      <!-- Brand -->
+      <a href="/" class="brand" aria-label="Eventhub home"
+         style="display: flex; align-items: center; text-decoration: none; color: #1b4332; font-weight: 600; font-size: 1.25rem;">
+        <img src="/favicon.svg" alt="" 
+             class="brand__logo" 
+             style="height: 32px; width: 32px; margin-right: 8px;" />
+        <span class="brand__name">EventHub</span>
+      </a>
 
-        <!-- Search -->
-        <form class="search" role="search" aria-label="Site search">
-          <input
-            class="search__input"
-            type="text"
-            placeholder="Search"
-            aria-label="Search"
-          />
-          <button type="button" class="search__mic" aria-label="Voice search">
-            🎤
-          </button>
-        </form>
-      </div>
+      <!-- Search -->
+      <form class="search" role="search" aria-label="Site search" 
+            style="display: flex; align-items: center; background: #f1f3f2; border-radius: 24px; padding: 4px 10px;">
+        <input
+          class="search__input"
+          type="text"
+          placeholder="Search"
+          aria-label="Search"
+          style="border: none; background: transparent; outline: none; padding: 6px 8px; font-size: 0.95rem; width: 160px;"
+        />
+        <button type="button" 
+                class="search__mic" 
+                aria-label="Voice search"
+                style="border: none; background: none; cursor: pointer; font-size: 1rem;">
+          🎤
+        </button>
+      </form>
+    </div>
 
-      <div class="topbar__right">
-        <!-- Right actions -->
-        <nav class="actions">
-          <!-- Logged out -->
-          <div class="actions__group" sec:authorize="!isAuthenticated()">
-            <a th:href="@{/register}" class="btn btn--ghost">✍️ Sign up</a>
-            <a th:href="@{/login}" class="btn btn--primary">🔐 Log in</a>
+    <!-- Right section -->
+    <div class="topbar__right" style="display: flex; align-items: center;">
+      <nav class="actions" style="display: flex; align-items: center; gap: 1rem;">
+        
+        <!-- Logged out -->
+        <div class="actions__group" sec:authorize="!isAuthenticated()" style="display: flex; gap: 0.75rem;">
+          <a th:href='@{/register}' 
+             class="btn btn--ghost"
+             style="padding: 0.5rem 1rem; border-radius: 8px; border: 1px solid #1b4332; color: #1b4332; text-decoration: none;">
+             ✍️ Sign up
+          </a>
+          <a th:href='@{/login}' 
+             class="btn btn--primary"
+             style="padding: 0.5rem 1rem; border-radius: 8px; background: #1b4332; color: #fff; text-decoration: none;">
+             🔐 Log in
+          </a>
+        </div>
+
+        <!-- Logged in -->
+        <div class="actions__group actions__group--auth" sec:authorize="isAuthenticated()" style="display: flex; align-items: center; gap: 1rem;">
+          
+          <!-- Admin -->
+          <div sec:authorize="hasRole('ADMIN')">
+            <a th:href='@{/admin/dashboard}' 
+               class="nav-button user" 
+               style="padding: 0.4rem 1rem; background: #004085; color: #fff; border-radius: 6px; text-decoration: none; font-weight: 500;">
+               ADMIN DASHBOARD
+            </a>
           </div>
 
-          <!-- Logged in -->
-          <div
-            class="actions__group actions__group--auth"
-            sec:authorize="isAuthenticated()"
-          >
-            <div sec:authorize="hasRole('ORGANISER')">
-              <a th:href="@{/organiser/dashboard}" class="btn btn--ghost"
-                >📊 Organiser Dashboard</a
-              >
-            </div>
-
-          <div sec:authorize="isAuthenticated()">
-            <div sec:authorize="hasRole('ADMIN')">
-              <a th:href="@{/admin/dashboard}" class="nav-button user" style="margin-right: 1rem;">ADMIN DASHBOARD</a>
-            </div>
-
-           <div sec:authorize="hasRole('ORGANISER')">
-              <a th:href="@{/organiser/dashboard}" class="nav-button user" style="margin-right: 1rem;">DASHBOARD</a>
-            <div sec:authorize="hasRole('USER')">
-              <a
-                th:href="@{'/rsvp/' + ${currentUserId} + '/my-rsvps'}"
-                class="btn btn--ghost"
-                >👤 My Dashboard</a
-              >
-            </div>
-
-            <div class="user">
-              <img src="/default-avatar.png" alt="User avatar" class="avatar" />
-              <span class="user__welcome">Welcome,</span>
-              <span class="user__name" sec:authentication="name"
-                >user@example.com</span
-              >
-            </div>
-
-            <form th:action="@{/logout}" method="post">
-              <button type="submit" class="btn btn--danger">⏏ Logout</button>
-            </form>
+          <!-- Organiser -->
+          <div sec:authorize="hasRole('ORGANISER')">
+            <a th:href='@{/organiser/dashboard}' 
+               class="nav-button user" 
+               style="padding: 0.4rem 1rem; background: #155724; color: #fff; border-radius: 6px; text-decoration: none; font-weight: 500;">
+               DASHBOARD
+            </a>
           </div>
-        </nav>
-      </div>
+
+          <!-- User -->
+          <div sec:authorize="hasRole('USER')">
+            <a th:href="@{'/rsvp/' + ${currentUserId} + '/my-rsvps'}" 
+               class="btn btn--ghost"
+               style="padding: 0.4rem 1rem; border: 1px solid #1b4332; border-radius: 8px; color: #1b4332; text-decoration: none;">
+               👤 My Dashboard
+            </a>
+          </div>
+
+          <!-- User info -->
+          <div class="user" style="display: flex; align-items: center; gap: 0.5rem;">
+            <img src="/default-avatar.png" alt="User avatar" 
+                 class="avatar" 
+                 style="width: 32px; height: 32px; border-radius: 50%;" />
+            <span class="user__welcome" style="font-size: 0.9rem; color: #555;">Welcome,</span>
+            <span class="user__name" sec:authentication="name" style="font-weight: 600;">user@example.com</span>
+          </div>
+
+          <!-- Logout -->
+          <form th:action="@{/logout}" method="post" style="margin: 0;">
+            <button type="submit" 
+                    class="btn btn--danger" 
+                    style="padding: 0.5rem 1rem; background: #b02a37; color: #fff; border: none; border-radius: 8px; cursor: pointer;">
+              ⏏ Logout
+            </button>
+          </form>
+        </div>
+      </nav>
     </div>
   </div>
 </header>
