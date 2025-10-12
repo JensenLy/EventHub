@@ -3,6 +3,7 @@ package au.edu.rmit.sept.webapp.repository;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -141,5 +142,25 @@ System.out.println("SQL: " + sql);
     }
             return events;
         }
+
+public List<Map<String, Object>> findAttendeesForCsvExport(Long eventId) {
+    String sql = """
+        SELECT u.name, u.email
+        FROM rsvp r
+        JOIN users u ON r.user_id = u.user_id
+        WHERE r.event_id = ?
+        ORDER BY u.name ASC
+        """;
+    
+    return jdbcTemplate.query(sql, ps -> ps.setLong(1, eventId), (rs, rowNum) -> {
+        Map<String, Object> row = new java.util.HashMap<>();
+        row.put("name", rs.getString("name"));
+        row.put("email", rs.getString("email"));
+        return row;
+    });
+}
+
+
+
 }
 
