@@ -148,6 +148,22 @@ public class EventService {
     return eventRepo.findEventsByIdAndOrganiser(eventId, organiserId);
   }
 
+
+
+    /**
+   * Search events by keyword (name, description, or location).
+   */
+  public List<Event> searchEvents(String searchQuery) {
+    return eventRepo.searchEvents(searchQuery);
+  }
+
+  /**
+   * Search and filter events by both keyword and category.
+   */
+  public List<Event> searchAndFilterEvents(String searchQuery, Long categoryId) {
+    return eventRepo.searchAndFilterEvents(searchQuery, categoryId);
+  }
+  
   public List<Event> getRecommendedEvents(List<Long> preferredCategoryIds) {
     return eventRepo.getRecommendedEvents(preferredCategoryIds);
   }
