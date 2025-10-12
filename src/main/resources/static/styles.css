@@ -8,6 +8,7 @@
   --line: #e6e8ef;
   --chip: #f2f4f8;
   --shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+  --rsvped-bg: #e6ffe6;
 }
 * {
   box-sizing: border-box;
@@ -23,7 +24,6 @@ body {
   color: var(--text);
 }
 
-/* Layout hooks */
 .page {
   max-width: 1140px;
   margin: 0 auto;
@@ -86,7 +86,7 @@ body {
   text-decoration: underline;
 }
 
-/* Top bar */
+/* Top bar
 .topbar {
   display: flex;
   justify-content: space-between;
@@ -114,7 +114,7 @@ body {
   margin-right: 8px;
   filter: invert(16%) sepia(89%) saturate(3063%) hue-rotate(50deg)
     brightness(95%) contrast(101%);
-}
+} */
 
 .filter-form {
   display: flex;
@@ -123,7 +123,7 @@ body {
   gap: 50px;
 }
 
-.search {
+/* .search {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -146,13 +146,13 @@ body {
   background: transparent;
   cursor: pointer;
   font-size: 18px;
-}
-.topbar-right .link {
+} */
+/* .topbar-right .link {
   margin-left: 16px;
   color: var(--brand);
   text-decoration: none;
   margin-right: 20px;
-}
+} */
 
 /* Hero */
 .hero {
@@ -351,6 +351,11 @@ body {
   flex-direction: column;
   overflow: hidden;
   transition: all 0.3s ease;
+}
+
+.card-rsvped {
+  background: var(--rsvped-bg);
+  border-color: #90EE90;
 }
 
 .card:hover {
@@ -643,6 +648,22 @@ body {
   gap: 8px;
 }
 
+.chip-row .btn {
+  border-radius: 14px;
+  padding: 10px 16px;
+  font-weight: 600;
+  box-shadow: none;
+}
+
+.btn-outline-dark {
+  background: #e5e7eb;
+  color: #111827;
+  border: 1px solid #d1d5db;
+}
+.btn-outline-dark:hover {
+  background: #d1d5db;
+}
+
 .chip-row-inline {
   display: flex;
   flex-wrap: wrap;
@@ -890,11 +911,71 @@ body {
   border-radius: 30px;
 }
 .nav-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: 20px;
   background-color: #00cf0d;
-  border-radius: 30px;
-  padding: 5px;
   color: white;
   text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+  border: none;
+  transition: all 0.2s ease;
+}
+
+.nav-button i {
+  font-size: 16px;
+}
+
+/* User navigation button style */
+.nav-button.user-nav {
+  background-color: #f8f9fa;
+  color: #00cf0d;
+  border: 1px solid #e2e8f0;
+}
+
+.nav-button.user-nav:hover {
+  background-color: #00cf0d;
+  color: white;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* User info section */
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding-left: 16px;
+}
+
+.username {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #4a5568;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.username i {
+  color: #00cf0d;
+}
+
+/* Logout button */
+.nav-button.logout-btn {
+  background-color: transparent;
+  color: #4a5568;
+  border: 1px solid #e2e8f0;
+  padding: 6px 12px;
+}
+
+.nav-button.logout-btn:hover {
+  background-color: #fff5f5;
+  color: #e53e3e;
+  border-color: #feb2b2;
 }
 .nav-button:hover {
   background-color: #00a60b;
@@ -922,4 +1003,223 @@ body {
 .table, th, td {
   border: 1px solid black;
   border-collapse: collapse;
+
+/*
+  Recommendations page (scoped)
+   */
+.recommend-page {
+  --card-gap: 20px;
+  --card-radius: 14px;
+  --card-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+}
+
+.recommend-summary {
+  text-align: center;
+  margin: 20px auto 40px;
+  max-width: 800px;
+  color: #374151;
+  font-size: 16px;
+  line-height: 1.6;
+  background: #f7f9fc;
+  border-radius: 12px;
+  padding: 16px 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.recommend-summary span {
+  color: #00cf0d;
+  font-weight: 600;
+}
+
+/* Header area */
+.recommend-page .recommend-header {
+  max-width: 1200px;
+  margin: 12px auto 10px;
+  padding: 0 20px;
+}
+.recommend-page .recommend-header h2 {
+  margin: 0 0 6px;
+  font-size: 24px;
+  line-height: 1.2;
+}
+.recommend-page .recommend-header p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+/* Card grid: compact & responsive */
+.recommend-page .cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--card-gap);
+  max-width: 1200px;
+  margin: 16px auto 28px;
+  padding: 0 20px;
+}
+
+/* Card look & feel */
+.recommend-page .card {
+  border-radius: var(--card-radius);
+  overflow: hidden;
+  border: 1px solid var(--line);
+  box-shadow: var(--card-shadow);
+  transition: transform 0.18s ease, box-shadow 0.22s ease;
+  background: var(--card);
+}
+.recommend-page .card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.12);
+}
+
+/* Card content spacing */
+.recommend-page .card-body {
+  padding: 16px 16px 10px;
+}
+
+/* Title, price, text */
+.recommend-page .card-title {
+  font-size: 1.05rem;
+  margin: 0 0 6px;
+}
+.recommend-page .card-price {
+  margin: 0 0 8px;
+}
+.recommend-page .card-text {
+  color: var(--muted);
+  font-size: 0.93rem;
+  line-height: 1.45;
+  margin: 0 0 10px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Chips under description */
+.recommend-page .card-categories {
+  margin: 6px 0 4px;
+}
+
+/* Meta row (date/location) */
+.recommend-page .card-meta {
+  display: flex;
+  gap: 12px;
+  padding: 0 16px 10px;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+/* Image area smaller for compact feel */
+.recommend-page .img-placeholder {
+  height: 160px;
+  border-radius: 10px;
+}
+
+/* Buttons unified and tidy */
+.recommend-page .btn {
+  width: 100%;
+  border-radius: 10px;
+  margin: 8px 0 0;
+  padding: 10px 12px;
+  font-weight: 600;
+}
+.recommend-page .btn-dark {
+  background: #00cf0d;
+  color: #fff;
+}
+.recommend-page .btn-dark:hover {
+  background: #00a60b;
+}
+.recommend-page .btn-light {
+  background: #fff;
+  border: 1px solid var(--line);
+}
+
+/* Make the two action buttons feel grouped */
+.recommend-page .card .btn + .btn {
+  margin-top: 6px;
+}
+
+/* Empty state alignment on this page */
+.recommend-page .empty-events {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 18px;
+  border: 1px dashed var(--line);
+  border-radius: 10px;
+  color: var(--muted);
+}
+
+.empty-events .link-dashboard {
+  color: #00cf0d;
+  font-weight: 600;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.empty-events .link-dashboard:hover {
+  color: #00a60b;
+  text-decoration: underline;
+}
+
+/* Back link spacing at bottom (if used) */
+.recommend-page .btn-light[href] {
+  display: inline-block;
+  width: auto;
+  margin: 0 20px 24px;
+}
+
+/* Small screens */
+@media (max-width: 480px) {
+  .recommend-page .img-placeholder {
+    height: 140px;
+  }
+  .recommend-page .card-body {
+    padding: 14px 14px 8px;
+  }
+}
+
+.testimonials {
+  margin: 60px auto 40px;
+  text-align: center;
+  max-width: 900px;
+}
+
+.testimonials h3 {
+  font-size: 22px;
+  font-weight: 700;
+  margin-bottom: 24px;
+  color: #111827;
+}
+
+.testimonial-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 20px;
+}
+
+.testimonial-card {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.testimonial-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+}
+
+.quote {
+  font-style: italic;
+  color: #374151;
+  margin-bottom: 12px;
+}
+
+.author {
+  font-weight: 600;
+  color: #00a60b;
 }

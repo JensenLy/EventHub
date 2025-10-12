@@ -126,5 +126,40 @@ public class UserRepository {
             userId
         );
   }
+
+  /*
+   * Gets the list of preferred categories of the current user from the database
+   */
+  public List<Long> getUserPreferredCategories(Long userId)
+  {
+    String sql = "SELECT category_id FROM user_preferred_category WHERE user_id = ?";
+    return jdbcTemplate.queryForList(sql, Long.class, userId);
+  }
+
+  /*
+   * Saves the preferred categories chosen by the current user to the database
+   */
+  public void saveUserPreferredCategories(Long userId, List<Long> categoryIds)
+  {
+    String sql = "DELETE FROM user_preferred_category WHERE user_id = ?";
+    jdbcTemplate.update(sql,userId);
+
+    sql = "INSERT INTO user_preferred_category (user_id, category_id) VALUES (?, ?)";
+    for (Long categoryId : categoryIds) {
+        jdbcTemplate.update(sql, userId, categoryId);
+    }
+  }
+  
+  /*
+   * Resets the saved preferred categories before
+   */
+  public void resetUserSavedPreferredCategories(Long userId)
+  {
+    String sql = "DELETE FROM user_preferred_category WHERE user_id = ?";
+    jdbcTemplate.update(sql,userId);
+  }
+
+
+  
 }
 

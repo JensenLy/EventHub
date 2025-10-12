@@ -147,4 +147,8 @@ public class EventService {
   public Event findEventsByIdAndOrganiser(Long eventId, Long organiserId) {
     return eventRepo.findEventsByIdAndOrganiser(eventId, organiserId);
   }
+
+  public List<Event> getRecommendedEvents(List<Long> preferredCategoryIds) {
+    return eventRepo.getRecommendedEvents(preferredCategoryIds);
+  }
 }

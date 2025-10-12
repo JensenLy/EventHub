@@ -61,7 +61,7 @@ public class Event {
     this.capacity = 0;
     this.categories = List.of();
     this.price = BigDecimal.ZERO;
-    this.imageUrl = "/meetup.jpg";
+    this.imageUrl = null;
     this.detailedDescription ="";
     this.agenda = "";
     this.speakers = "";
@@ -81,7 +81,7 @@ public class Event {
                   this.categories = categories;
                   this.capacity = capacity;
                   this.price = price;
-                  this.imageUrl = "/meetup.jpg";
+                  this.imageUrl = null;
                   this.detailedDescription = "";
                   this.agenda = "";
                   this.speakers = "";
@@ -154,4 +154,37 @@ public class Event {
   public String getSpeakers() { return speakers; }
   public String getDressCode() { return dressCode; }
   public boolean getEventStatus(){ return eventStatus; }
+
+  // Display image: use explicit imageUrl if given, else map according to categories
+  public String displayImageUrl() {
+    if (this.imageUrl != null && !this.imageUrl.isBlank()) {
+      return this.imageUrl;
+    }
+
+    // Map to existing categories
+    final java.util.Map<String, String> imageByCategory = java.util.Map.ofEntries(
+      java.util.Map.entry("career", "/career.jpg"),
+      java.util.Map.entry("festival", "/festival.jpg"),
+      java.util.Map.entry("hackathon", "/hackathon.jpg"),
+      java.util.Map.entry("meetup", "/meetup2.jpg"),
+      java.util.Map.entry("social", "/social.jpg"),
+      java.util.Map.entry("sports", "/sports.jpg")   
+    );
+
+    if (this.categories != null) {
+      for (String c : this.categories) {
+        String key = normaliseCategory(c);
+        if (imageByCategory.containsKey(key)) {
+          return imageByCategory.get(key);
+        }
+      }
+    }
+
+    // Global default
+    return "/meetup.jpg";
+  }
+  private static String normaliseCategory(String c) {
+    if (c == null) return "";
+    return c.trim().toLowerCase().replace(' ', '-');
+  }
 }
