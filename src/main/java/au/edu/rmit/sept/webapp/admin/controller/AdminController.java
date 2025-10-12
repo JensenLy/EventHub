@@ -4,6 +4,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -93,12 +94,28 @@ public class AdminController {
     @GetMapping("/events/{eventId}/reports")
     public String eventReports(@PathVariable Long eventId, Model model) {
         Event event = eventService.findById(eventId);
-
         List<Report> reports = reportService.getReportsByEventID(eventId);
+
         if (reports == null) {
             model.addAttribute("error", "Report not found");
             return dashboard(model);
         }
+
+        //Attaching user's info to report
+        List<User> allUsers = userService.getAllUsers();
+
+        Map<Long, User> userMap = allUsers.stream()
+            .collect(Collectors.toMap(User::getUserId, u -> u));
+
+        for (Report report : reports) {
+            User user = userMap.get(report.getUserId());
+            if (user != null) {
+                report.setUserName(user.getName());
+                report.setUserRole(user.getRole());
+                report.setUserEmail(user.getEmail());
+            }
+        }
+
         model.addAttribute("event", event);
         model.addAttribute("reports", reports);
         return "admin/adminReports";
