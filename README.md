@@ -36,12 +36,31 @@ Password: "password123"
 
 ==============================
 
+
+======== STUDENT ROLE ========
+Username: "dummy@example.com"
+Password: "password123"
+
+==============================
+
+========= STUDENT ROLE ======= (they are being ban so they unable to log in or rsvp)
+Username: "dummy9@example.com"
+Password: "password123"
+
+==============================
+
+
 ========= ORGANISER ROLE =======
 Username: "dummy5@example.com"
 Password: "password123"
 
 ==============================
 
+========= ADMIN ROLE =======
+Username: "dumm7@example.com"
+Password: "password123"
+
+==============================
 ===== Run Docker =====
 
 == docker compose down -v ==
