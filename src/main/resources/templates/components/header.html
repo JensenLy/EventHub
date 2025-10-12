@@ -1,15 +1,10 @@
-<header
-  th:fragment="header"
-  xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
->
-  <div class="topbar">
-    <div class="topbar__inner">
-      <div class="topbar__left">
-        <!-- Brand -->
-        <a href="/" class="brand" aria-label="Eventhub home">
-          <img src="/favicon.svg" alt="" class="brand__logo" />
-          <span class="brand__name">EventHub</span>
-        </a>
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+  <body>
+    <th:block th:fragment="head">
+      <link rel="stylesheet" th:href="@{/styles.css}" />
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+    </th:block>
 
         <!-- Search -->
         <form class="search" role="search" aria-label="Site search">
@@ -53,17 +48,23 @@
               >
             </div>
 
-            <div class="user">
-              <img src="/default-avatar.png" alt="User avatar" class="avatar" />
-              <span class="user__welcome">Welcome,</span>
-              <span class="user__name" sec:authentication="name"
-                >user@example.com</span
-              >
-            </div>
-
-            <form th:action="@{/logout}" method="post">
-              <button type="submit" class="btn btn--danger">⏏ Logout</button>
-            </form>
+              <div sec:authorize="hasRole('USER')" style="margin-right: 1.5rem;">
+                <a th:href="@{'/rsvp/' + ${currentUserId} + '/my-rsvps'}" class="nav-button user-nav">
+                  <i class="fas fa-calendar-check"></i> MY RSVP
+                </a>
+              </div>
+          
+              <div class="user-info">
+                <span class="username">
+                  <i class="fas fa-user"></i>
+                  <span sec:authentication="name">Username</span>
+                </span>
+                <form th:action="@{/logout}" method="post" style="display: inline-block;">
+                  <button type="submit" class="nav-button logout-btn">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                  </button>
+                </form>
+              </div>
           </div>
         </nav>
       </div>
