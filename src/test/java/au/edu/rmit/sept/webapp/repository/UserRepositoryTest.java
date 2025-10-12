@@ -1,9 +1,8 @@
 package au.edu.rmit.sept.webapp.repository;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import java.util.Map;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -42,5 +41,21 @@ class UserRepositoryTest {
     assertThat(row.get("AVATAR_URL")).isNull(); // left null
     assertThat(row.get("BIO")).isEqualTo("Coder & foodie");
     assertThat(((String)row.get("GENDER")).toLowerCase()).isEqualTo("male");
+  }
+
+  @Test
+  void updateUserStatus_updates_status_column() {
+    // find an existing seeded user
+    Long userId = jdbc.queryForObject(
+        "SELECT user_id FROM users WHERE email = 'dummy@example.com'", Long.class);
+
+    // act: call your repository method
+    repo.updateUserStatus(userId, "banned");
+
+    // assert: check the updated value in the DB
+    String status = jdbc.queryForObject(
+        "SELECT status FROM users WHERE user_id = ?", String.class, userId);
+
+    assertThat(status).isEqualTo("banned");
   }
 }
