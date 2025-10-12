@@ -2,6 +2,7 @@ package au.edu.rmit.sept.webapp.service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.stereotype.Service;
 
@@ -59,4 +60,10 @@ public class RSVPService {
     public boolean hasUserRsvped(Long userId, Long eventId) {
     return rsvpRepository.checkUserAlreadyRsvped(userId, eventId);
     }
+
+
+    
+public List<Map<String, Object>> getAttendeesForCsvExport(Long eventId) {
+    return rsvpRepository.findAttendeesForCsvExport(eventId);
+}
 }

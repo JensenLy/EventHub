@@ -1,7 +1,15 @@
 package au.edu.rmit.sept.webapp.controller;
 
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.io.ByteArrayOutputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Map;
 
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -88,4 +96,89 @@ public class OrganiserController {
     model.addAttribute("attendees", attendees);
     return "organiserRsvps";
   }
+
+  @GetMapping("/events/{eventId}/attendees/export")
+  public ResponseEntity<byte[]> exportAttendeesToCsv(@PathVariable Long eventId) {
+    System.out.println("Export called for eventId: " + eventId);
+    
+    // Get current user
+    long organiserId = currentUserService.getCurrentUserId();
+    
+    // Verify event belongs to this organiser
+    Event event = eventService.findEventsByIdAndOrganiser(eventId, organiserId);
+    if (event == null) {
+        System.out.println("Event not found or not authorized");
+        return ResponseEntity.notFound().build();
+    }
+    
+    // Get attendees
+    List<Map<String, Object>> attendees = rsvpService.getAttendeesForCsvExport(eventId);
+    System.out.println("Found " + attendees.size() + " attendees");
+    
+    try {
+        // Create CSV content
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        PrintWriter writer = new PrintWriter(new OutputStreamWriter(baos, StandardCharsets.UTF_8));
+        
+        // Write CSV header
+        writer.println("Name,Email");
+        
+        // Write attendee data
+        for (Map<String, Object> attendee : attendees) {
+            String name = escapeCsv((String) attendee.get("name"));
+            String email = escapeCsv((String) attendee.get("email"));
+            writer.println(name + "," + email);
+        }
+        
+        writer.flush();
+        writer.close();
+        
+        // Prepare response
+        byte[] csvBytes = baos.toByteArray();
+        
+        // Create sanitized filename from event name
+        String filename = sanitizeFilename(event.getName()) + "_attendees.csv";
+        System.out.println("Generating CSV file: " + filename);
+        
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.parseMediaType("text/csv"));
+        headers.setContentDispositionFormData("attachment", filename);
+        headers.setCacheControl("must-revalidate, post-check=0, pre-check=0");
+        
+        return ResponseEntity
+            .ok()
+            .headers(headers)
+            .body(csvBytes);
+            
+    } catch (Exception e) {
+        e.printStackTrace();
+        return ResponseEntity.internalServerError().build();
+    }
+  }
+
+  
+private String escapeCsv(String value) {
+    if (value == null) {
+        return "";
+    }
+    // If value contains comma, quote, or newline, wrap in quotes and escape quotes
+    if (value.contains(",") || value.contains("\"") || value.contains("\n")) {
+        return "\"" + value.replace("\"", "\"\"") + "\"";
+    }
+    return value;
+}
+
+
+// Helper method to create safe filename
+private String sanitizeFilename(String filename) {
+    if (filename == null) {
+        return "event";
+    }
+    // Remove or replace invalid filename characters
+    return filename.replaceAll("[^a-zA-Z0-9-_\\s]", "")
+                   .replaceAll("\\s+", "_")
+                   .substring(0, Math.min(filename.length(), 50));
+}
+
+
 }
