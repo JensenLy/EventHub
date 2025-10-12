@@ -69,7 +69,7 @@ public class EventRepository {
         LEFT JOIN event_categories ec ON e.event_id = ec.event_id
         LEFT JOIN categories c ON ec.category_id = c.category_id
         WHERE e.date_time >= CURRENT_TIMESTAMP
-        AND e.event_status = TRUE
+        AND (e.event_status = TRUE OR e.event_status IS NULL)
         ORDER BY e.date_time ASC
         """;
     

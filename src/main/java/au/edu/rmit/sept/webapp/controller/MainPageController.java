@@ -106,10 +106,13 @@ public class MainPageController {
 
     // Map to hold RSVP status for each event
     Map<Long, Boolean> rsvpStatusMap = new HashMap<>();
-    for (Event event : events) {
-      boolean hasRsvped = rsvpRepository.checkUserAlreadyRsvped(currentUserId, event.getEventId());
-      rsvpStatusMap.put(event.getEventId(), hasRsvped);
+    if (currentUserId != null) {
+      for (Event event : events) {
+        boolean hasRsvped = rsvpRepository.checkUserAlreadyRsvped(currentUserId, event.getEventId());
+        rsvpStatusMap.put(event.getEventId(), hasRsvped);
+      }
     }
+    
 
     // Get all categories for filter options
     List<EventCategory> categories = categoryService.getAllCategories();
