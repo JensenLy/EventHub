@@ -26,7 +26,7 @@ import au.edu.rmit.sept.webapp.service.UserService;
 @SpringBootTest
 @AutoConfigureMockMvc
 @WithMockUser
-class EventControllerRecommendationsTest {
+class EventControllerFullInfoTest {
 
     @Autowired
     private MockMvc mvc;

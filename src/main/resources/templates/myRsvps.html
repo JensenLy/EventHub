@@ -170,13 +170,13 @@
             <h3 class="card-title" th:text="${event.name}">Event</h3>
             <div class="card-price">
               <span
-                th:text="${event.price != null ? '$' + #numbers.formatDecimal(event.price, 1, 2) : '$0'}"
-                >$0</span
+                th:text="${event.price != null && event.price > 0 ? '$' + #numbers.formatDecimal(event.price, 1, 'COMMA', 2, 'POINT') : 'Free'}"
+                >Free</span
               >
             </div>
             <p
               class="card-text"
-              th:text="${event.desc != null ? event.desc : 'Event description goes here...'}"
+              th:text="${event.description != null ? event.description : 'Event description goes here...'}"
             >
               Body text.
             </p>
@@ -184,7 +184,7 @@
             <!-- Event Categories -->
             <div
               class="card-categories"
-              th:if="${event.category != null and !#lists.isEmpty(event.category)}"
+              th:if="${!#lists.isEmpty(event.category)}"
             >
               <span
                 th:each="catName : ${event.category}"
@@ -211,20 +211,15 @@
               <div class="img-placeholder">
                 <div class="placeholder-icon">
                   <img
-                    th:if="${event.imageUrl != null}"
-                    th:src="${event.imageUrl}"
-                    alt="event image"
+                    th:src="@{${event.displayImageUrl()}}"
+                    th:alt="${event.name + ' event image'}"
                     class="event-card-image"
+                    onerror="this.onerror=null;this.src='/meetup.jpg';"
                   />
-                  <div
-                    th:if="${event.imageUrl == null}"
-                    class="event-card-image"
-                  >
-                    No image
-                  </div>
                 </div>
               </div>
             </div>
+            
             <!-- Button for hidden modal -->
             <button
               type="button"
@@ -248,7 +243,7 @@
           </div>
 
           <!-- Hidden modal template -->
-          <template th:id="${'event-template-' + event.eventId}">
+          <template th:id="'event-template-' + ${event.eventId}">
             <th:block
               th:replace="~{components/eventDetail :: eventDetails(event=${event})}"
             ></th:block>

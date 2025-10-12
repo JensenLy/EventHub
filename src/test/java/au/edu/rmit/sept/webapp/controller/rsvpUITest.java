@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.not;
 import static org.hamcrest.Matchers.containsString;
 import org.junit.jupiter.api.Test;
 import static org.mockito.Mockito.when;
@@ -11,6 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.security.test.context.support.WithMockUser;
+
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import org.springframework.test.web.servlet.MockMvc;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -21,6 +24,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import au.edu.rmit.sept.webapp.model.Event;
 import au.edu.rmit.sept.webapp.repository.RsvpRepository;
+import au.edu.rmit.sept.webapp.service.CategoryService;
 import au.edu.rmit.sept.webapp.service.CurrentUserService;
 import au.edu.rmit.sept.webapp.service.EventService;
 import au.edu.rmit.sept.webapp.service.RSVPService;
@@ -36,6 +40,7 @@ public class rsvpUITest {
     @MockBean CurrentUserService currentUserService; 
     @MockBean RSVPService rsvpService;
     @MockBean UserService userService;
+    @MockBean CategoryService categoryService;
 
 
     LocalDateTime fixedDateTime = LocalDateTime.of(2026, 9, 22, 12, 0);
@@ -51,14 +56,18 @@ public class rsvpUITest {
       return e;
     }
 
-    @Test
-    void Should_ShowRSVPButton_MainPage() throws Exception {
+       @Test
+    @WithMockUser(username = "dummy@example.com", roles = {"STUDENT"})
+    void Should_ShowRSVPButton_MainPage_WhenAuthenticated() throws Exception {
         
         when(eventService.getUpcomingEvents()).thenReturn(List.of(
             ev(10, "Test", "Lab", fixedDateTime),
             ev(11, "DummyEvent", "NoWhere", fixedDateTime)
         ));
         when(currentUserService.getCurrentUserId()).thenReturn(15L);
+        when(categoryService.getAllCategories()).thenReturn(List.of());
+        when(rsvpRepository.checkUserAlreadyRsvped(15L, 10L)).thenReturn(false);
+        when(rsvpRepository.checkUserAlreadyRsvped(15L, 11L)).thenReturn(false);
 
         mvc.perform(get("/"))
           .andExpect(status().isOk())
@@ -68,7 +77,8 @@ public class rsvpUITest {
           .andExpect(content().string(containsString("rsvp/15/event/11")));
     }
 
-    @Test
+  @Test
+    @WithMockUser(username = "dummy@example.com", roles = {"STUDENT"})
     void Should_ShowDeleteButton_WhenRSVPed_MainPage() throws Exception {
         
         when(eventService.getUpcomingEvents()).thenReturn(List.of(
@@ -76,7 +86,9 @@ public class rsvpUITest {
             ev(11, "DummyEvent", "NoWhere", fixedDateTime)
         ));
         when(rsvpRepository.checkUserAlreadyRsvped(15L, 10L)).thenReturn(true);
+        when(rsvpRepository.checkUserAlreadyRsvped(15L, 11L)).thenReturn(false);
         when(currentUserService.getCurrentUserId()).thenReturn(15L);
+        when(categoryService.getAllCategories()).thenReturn(List.of());
 
         mvc.perform(get("/"))
           .andExpect(status().isOk())

@@ -96,52 +96,64 @@ public class RsvpRepository {
     }
 
     // returns a list of events which are rsvped by a userId, with sort order (defaults to ascending)  
-    public List<Event> findEventsByUserId(Long userId, String sortOrder) {
-        String order = " ASC";
-        
 
-        if("DESC".equalsIgnoreCase(sortOrder)){
-            order = " DESC";
-        }
+public List<Event> findEventsByUserId(Long userId, String sortOrder) {
+    String order = " ASC";
+    
+    if("DESC".equalsIgnoreCase(sortOrder)){
+        order = " DESC";
+    }
 
-        String sql = """
-            SELECT e.event_id, e.name, e.description, e.created_by_user_id,
-                e.date_time, e.location, e.capacity, e.price
-            FROM events e
-            JOIN rsvp r ON e.event_id = r.event_id
-            WHERE r.user_id = ?
-            ORDER BY e.date_time 
-            """ + order;
-             System.out.println("Sort order: " + sortOrder);
-System.out.println("SQL: " + sql);
+    String sql = """
+        SELECT e.event_id, e.name, e.description, e.detailed_description,
+            e.created_by_user_id, e.date_time, e.location, e.capacity, e.price,
+            e.agenda, e.speakers, e.dress_code
+        FROM events e
+        JOIN rsvp r ON e.event_id = r.event_id
+        WHERE r.user_id = ?
+        ORDER BY e.date_time 
+        """ + order;
+    
+    System.out.println("Sort order: " + sortOrder);
+    System.out.println("SQL: " + sql);
 
-
-    List<Event> events = jdbcTemplate.query(sql, ps -> ps.setLong(1, userId), (rs, rowNum) -> new Event(
+    List<Event> events = jdbcTemplate.query(sql, ps -> ps.setLong(1, userId), (rs, rowNum) -> {
+        Event event = new Event(
             rs.getLong("event_id"),
             rs.getString("name"),
             rs.getString("description"),
             rs.getObject("created_by_user_id") != null ? rs.getLong("created_by_user_id") : null,
             rs.getTimestamp("date_time").toLocalDateTime(),
             rs.getString("location"),
-            new ArrayList<>(), // we’ll fill categories next
+            new ArrayList<>(), // we'll fill categories next
             rs.getObject("capacity") != null ? rs.getInt("capacity") : null,
             rs.getBigDecimal("price")
-    ));
+        );
+        
+        // Set the additional fields
+        event.setDetailedDescription(rs.getString("detailed_description"));
+        event.setAgenda(rs.getString("agenda"));
+        event.setSpeakers(rs.getString("speakers"));
+        event.setDressCode(rs.getString("dress_code"));
+        
+        return event;
+    });
 
-        for(Event event : events){
-            String catSql = """
-                    SELECT c.name
-                    FROM categories c
-                    JOIN event_categories ec ON c.category_id = ec.category_id
-                    WHERE ec.event_id = ?
-                    """;
+    for(Event event : events){
+        String catSql = """
+                SELECT c.name
+                FROM categories c
+                JOIN event_categories ec ON c.category_id = ec.category_id
+                WHERE ec.event_id = ?
+                """;
 
-            List<String> categories = jdbcTemplate.query(catSql, ps -> ps.setLong(1, event.getEventId()),
-            (rs, rowNum) -> rs.getString("name"));
-            event.setCategory(categories);
+        List<String> categories = jdbcTemplate.query(catSql, ps -> ps.setLong(1, event.getEventId()),
+        (rs, rowNum) -> rs.getString("name"));
+        event.setCategory(categories);
     }
-            return events;
-        }
+    
+    return events;
+}
 
 public List<Map<String, Object>> findAttendeesForCsvExport(Long eventId) {
     String sql = """
